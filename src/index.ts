@@ -1,7 +1,7 @@
-/* eslint-disable no-console */
 import express from 'express';
 const app = express();
 import dotenv from 'dotenv';
+import { logservice } from './services/loggerService';
 
 dotenv.config();
 const PORT = process.env.PORT || 5000;
@@ -41,4 +41,4 @@ app.get('/', (req, res) => {
   res.send(htmlContent);
 });
 
-app.listen(PORT, () => console.log(`Express is listening at http://localhost:${PORT}`));
+app.listen(PORT, () => logservice.info(false, `Express is listening at http://localhost:${PORT}`));
