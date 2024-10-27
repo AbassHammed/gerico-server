@@ -168,7 +168,8 @@ class JwtServices implements IJwt {
       throw new Error('Invalid token signature');
     }
 
-    return JSON.parse(this.base64URLDecode(payload));
+    const decodedPayload: JwtPayload = JSON.parse(this.base64URLDecode(payload));
+    return decodedPayload;
   }
 }
 
