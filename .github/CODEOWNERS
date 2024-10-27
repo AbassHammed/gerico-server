@@ -1,0 +1,4 @@
+# Restrict ownership of the CODEOWNERS
+/.github/CODEOWNERS @AbassHammed
+
+@AbassHammed
