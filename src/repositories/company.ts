@@ -67,6 +67,18 @@ class CompanyRepository implements IRepository<ICompany> {
       );
     });
   }
+
+  delete(siret: string | number): Promise<true> {
+    return new Promise((resolve, reject) => {
+      connection.query('DELETE FROM company WHERE siret = ?', [siret], err => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(true);
+        }
+      });
+    });
+  }
 }
 
 export default new CompanyRepository();

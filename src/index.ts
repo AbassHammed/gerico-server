@@ -10,8 +10,7 @@ dotenv.config();
 import express from 'express';
 const app = express();
 import { logservice } from './services/loggerService';
-import connection from './models/connect';
-import { ITest } from './models/interface';
+import employee from './repositories/employee';
 
 const PORT = process.env.PORT || 5000;
 
@@ -50,22 +49,12 @@ app.get('/', (req, res) => {
   res.send(htmlContent);
 });
 
-function save(): Promise<ITest[]> {
-  return new Promise((resolve, reject) => {
-    connection.query<ITest[]>('SELECT * FROM test_table', (err, res) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(res);
-      }
-    });
-  });
-}
-
-(async () => {
-  const res = await save();
-  logservice.info(res[0].name);
-})();
+app.get('/test', (req, res) => {
+  (async () => {
+    const result2 = await employee.retrieveByEmail('john.doe@exampl.com');
+    return res.json({ result2 });
+  })();
+});
 
 app.listen(PORT, () => {
   logservice.info(`Express is listening at http://localhost:${PORT}`);

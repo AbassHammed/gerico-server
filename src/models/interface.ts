@@ -1,6 +1,6 @@
 import { RowDataPacket } from 'mysql2';
 
-export interface IEmployee extends RowDataPacket {
+export interface IEmployee {
   uid: string;
   civility: string;
   first_name: string;
@@ -15,19 +15,22 @@ export interface IEmployee extends RowDataPacket {
   updated_at: Date;
   departure_date?: Date;
   is_archived: boolean;
-  reset_code: string;
+  reset_code?: string;
   address_line1: string;
   address_line2?: string;
   city: string;
+  postal_code: string;
   state: string;
   country: string;
-  dob: string;
+  dob: Date;
   ss_number: string;
   work_hours_month: number;
   contrat_type: string;
-  marital_status: 'married' | 'divorced' | 'single' | 'partnership' | 'widowed';
+  marital_status: 'married' | 'divorced' | 'single' | 'partnership' | 'widowed' | string;
   dependents: number;
 }
+
+export interface IEmployeeRow extends IEmployee, RowDataPacket {}
 
 export interface IEmployeeLog extends RowDataPacket {
   log_id: string;
@@ -58,13 +61,6 @@ export interface ICompany extends RowDataPacket {
   postal_code: string;
   country: string;
   convention_collective: string;
-}
-
-export interface ITest extends RowDataPacket {
-  id: number;
-  // name: string;
-  age: number;
-  city: string;
 }
 
 /**

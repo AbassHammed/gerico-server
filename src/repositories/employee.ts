@@ -1,4 +1,4 @@
-import { IEmployee, IRepository } from '../models/interface';
+import { IEmployee, IEmployeeRow, IRepository } from '../models/interface';
 import connection from '../models/connect';
 import { ResultSetHeader } from 'mysql2';
 
@@ -49,7 +49,7 @@ class EmployeeRepository implements Required<IRepository<IEmployee>> {
 
   retrieveAll(): Promise<IEmployee[]> {
     return new Promise((resolve, reject) => {
-      connection.query<IEmployee[]>('SELECT * FROM employees', (err, res) => {
+      connection.query<IEmployeeRow[]>('SELECT * FROM employees', (err, res) => {
         if (err) {
           reject(err);
         } else {
@@ -61,19 +61,23 @@ class EmployeeRepository implements Required<IRepository<IEmployee>> {
 
   retrieveById(id: string | number): Promise<IEmployee> {
     return new Promise((resolve, reject) => {
-      connection.query<IEmployee[]>('SELECT * FROM employees WHERE uid = ?', [id], (err, res) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(res?.[0]);
-        }
-      });
+      connection.query<IEmployeeRow[]>(
+        'SELECT * FROM employees WHERE uid = ?',
+        [id],
+        (err, res) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(res?.[0]);
+          }
+        },
+      );
     });
   }
 
   retrieveByEmail(email: string): Promise<IEmployee> {
     return new Promise((resolve, reject) => {
-      connection.query<IEmployee[]>(
+      connection.query<IEmployeeRow[]>(
         'SELECT * FROM employees WHERE email = ?',
         [email],
         (err, res) => {
