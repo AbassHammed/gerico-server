@@ -6,7 +6,7 @@ class EmployeeRepository implements Required<IRepository<IEmployee>> {
   save(t: IEmployee): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query<ResultSetHeader>(
-        'INSERT INTO employees (uid, civility, first_name, last_name, email, phone_number, password, employee_post, is_admin, hire_date, created_at, updated_at, departure_date, is_archived, reset_code, address_line1, address_line2, city, state, postal_code, country, dob, ss_number, work_hours_month, contrat_type, marital_status, dependents) VALUES(?, ?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        'INSERT INTO employees (uid, civility, first_name, last_name, email, phone_number, password, employee_post, is_admin, hire_date, created_at, updated_at, departure_date, is_archived, reset_code, address_line1, address_line2, city, state, postal_code, country, dob, ss_number, work_hours_month, contrat_type, marital_status, dependents) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [
           t.uid,
           t.civility,

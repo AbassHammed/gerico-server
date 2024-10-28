@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import dotenv from 'dotenv';
 // The env variables needs to be configured here before importing any other file in the app entry
 // this allows each imported file that uses the env vars to have access to them
@@ -8,10 +9,12 @@ import dotenv from 'dotenv';
 // the process.env vars used in the './models/connect' file will be undefined which will cause connection errors
 dotenv.config();
 import express from 'express';
-const app = express();
 import { logservice } from './services/loggerService';
 import employee from './repositories/employee';
+import Server from './routes';
 
+const app = express();
+const server: Server = new Server(app);
 const PORT = process.env.PORT || 5000;
 
 app.get('/', (req, res) => {
