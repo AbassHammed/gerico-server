@@ -58,6 +58,18 @@ class UserRepository implements Required<IRepository<IUser>> {
     });
   }
 
+  retrieveByEmail(email: string): Promise<IUser> {
+    return new Promise((resolve, reject) => {
+      connection.query<IUser[]>('SELECT * FROM users WHERE email = ?', [email], (err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res?.[0]);
+        }
+      });
+    });
+  }
+
   update(t: IUser): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query<ResultSetHeader>(

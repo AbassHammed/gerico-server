@@ -113,7 +113,7 @@ Si le token est invalide ou expiré, le serveur retourne une erreur d'authentifi
  * Cette classe encode le header et le payload en base64, puis les signe avec une clé secrète.
  * La vérification du token compare la signature calculée à celle fournie, pour s'assurer que le contenu n'a pas changé.
  */
-class JwtServices implements IJwt {
+export class JwtServices implements IJwt {
   private secret: string;
 
   constructor(secret: string) {
