@@ -1,9 +1,18 @@
+import dotenv from 'dotenv';
+// The env variables needs to be configured here before importing any other file in the app entry
+// this allows each imported file that uses the env vars to have access to them
+// i.e if you do something like this :
+// import connection from './models/connect'
+// import dotenv from 'dotenv'
+// dotenv.config()
+// the process.env vars used in the './models/connect' file will be undefined which will cause connection errors
+dotenv.config();
 import express from 'express';
 const app = express();
-import dotenv from 'dotenv';
 import { logservice } from './services/loggerService';
+import connection from './models/connect';
+import { ITest } from './models/interface';
 
-dotenv.config();
 const PORT = process.env.PORT || 5000;
 
 app.get('/', (req, res) => {
@@ -41,4 +50,23 @@ app.get('/', (req, res) => {
   res.send(htmlContent);
 });
 
-app.listen(PORT, () => logservice.info(false, `Express is listening at http://localhost:${PORT}`));
+function save(): Promise<ITest[]> {
+  return new Promise((resolve, reject) => {
+    connection.query<ITest[]>('SELECT * FROM test_table', (err, res) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(res);
+      }
+    });
+  });
+}
+
+(async () => {
+  const res = await save();
+  logservice.info(res[0].name);
+})();
+
+app.listen(PORT, () => {
+  logservice.info(`Express is listening at http://localhost:${PORT}`);
+});
