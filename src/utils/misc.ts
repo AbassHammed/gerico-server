@@ -1,10 +1,9 @@
-/* eslint-disable arrow-parens */
 export function isString(str: unknown): str is string {
   return typeof str === 'string';
 }
 
 export function generateUUIDv4(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
     const r = (Math.random() * 16) | 0;
     const v = c === 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
@@ -28,30 +27,14 @@ export function _format(
   message: string,
   ...args: (string | number | boolean | undefined | null)[]
 ): string {
-  let result: string;
-
-  if (args.length === 0) {
-    result = message;
-  } else {
-    result = message.replace(/\{(\d+)\}/g, (match, rest) => {
-      const index = parseInt(rest, 10);
-      const arg = args[index];
-      let result = match;
-      if (typeof arg === 'string') {
-        result = arg;
-      } else if (
-        typeof arg === 'number' ||
-        typeof arg === 'boolean' ||
-        arg === void 0 ||
-        arg === null
-      ) {
-        result = String(arg);
-      }
-      return result;
-    });
-  }
-
-  return result;
+  return message.replace(/\{(\d+)\}/g, (match, rest) => {
+    const index = parseInt(rest, 10);
+    const arg = args[index];
+    if (typeof arg === 'string' || typeof arg === 'number' || typeof arg === 'boolean') {
+      return String(arg);
+    }
+    return match; // Keep the placeholder if the argument is missing
+  });
 }
 
 /**
