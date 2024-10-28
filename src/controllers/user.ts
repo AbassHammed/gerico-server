@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Request, Response } from 'express';
 import { CreateUserInput } from '../middlewares/user.middleware';
-import userRepo from '../repositories/user';
+import userRepo from '../repositories/employee';
 import bcryptjs from 'bcryptjs';
 
 export class UserController {

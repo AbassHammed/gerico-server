@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import { Request, Response, NextFunction } from 'express';
 import jwtServices from '../services/jwtServices';
-import userRepo from '../repositories/user';
+import userRepo from '../repositories/employee';
 import { logservice } from '../services/loggerService';
 
 declare global {
