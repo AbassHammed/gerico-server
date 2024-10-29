@@ -173,4 +173,4 @@ export class JwtServices implements IJwt {
   }
 }
 
-export default new JwtServices(process.env.SECRET);
+export default new JwtServices(process.env.JWT_SECRET);

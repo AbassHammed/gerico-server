@@ -1,5 +1,9 @@
 import { Request, Response } from 'express';
-import { CreateEmployeeInput, LoginInput } from '../middlewares/employee.middleware';
+import {
+  CreateEmployeeInput,
+  ForgotPasswordInput,
+  LoginInput,
+} from '../middlewares/employee.middleware';
 import employeeRepo from '../repositories/employee';
 import bcryptjs from 'bcryptjs';
 import passwordManager from '../services/passwordManager';
@@ -9,17 +13,20 @@ import { logservice } from '../services/loggerService';
 import jwtServices from '../services/jwtServices';
 
 /**
- * 200 OK - La requête a réussi, et la réponse contient les données demandées.
- * 201 Created - La ressource a été créée avec succès suite à la requête.
- * 204 No Content - La requête a réussi, mais il n'y a pas de contenu à renvoyer.
- * 400 Bad Request - La requête est mal formée ou contient des données invalides.
- * 401 Unauthorized - La requête nécessite une authentification qui a échoué ou est manquante.
- * 403 Forbidden - La requête est comprise, mais l’accès est refusé par le serveur.
- * 404 Not Found - La ressource demandée est introuvable sur le serveur.
- * 409 Conflict - La requête ne peut pas être complétée en raison d'un conflit avec l'état actuel de la ressource.
- * 500 Internal Server Error - Une erreur inattendue s'est produite côté serveur.
- * 502 Bad Gateway - Le serveur a reçu une réponse invalide d’un autre serveur en amont.
- * 503 Service Unavailable - Le serveur est temporairement indisponible, généralement pour maintenance.
+
+```plaintext
+ 200 OK - La requête a réussi, et la réponse contient les données demandées.
+ 201 Created - La ressource a été créée avec succès suite à la requête.
+ 204 No Content - La requête a réussi, mais il n'y a pas de contenu à renvoyer.
+ 400 Bad Request - La requête est mal formée ou contient des données invalides.
+ 401 Unauthorized - La requête nécessite une authentification qui a échoué ou est manquante.
+ 403 Forbidden - La requête est comprise, mais l’accès est refusé par le serveur.
+ 404 Not Found - La ressource demandée est introuvable sur le serveur.
+ 409 Conflict - La requête ne peut pas être complétée en raison d'un conflit avec l'état actuel de la ressource.
+ 500 Internal Server Error - Une erreur inattendue s'est produite côté serveur.
+ 502 Bad Gateway - Le serveur a reçu une réponse invalide d’un autre serveur en amont.
+ 503 Service Unavailable - Le serveur est temporairement indisponible, généralement pour maintenance.
+```
  *
  * https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
  */
@@ -28,6 +35,12 @@ export class EmployeeController {
   async create(req: Request<object, object, CreateEmployeeInput>, res: Response) {
     try {
       const { email, last_name, dob, hire_date } = req.body;
+
+      const admin = await employeeRepo.retrieveById(req.user.uid);
+
+      if (!admin?.is_admin) {
+        return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
+      }
 
       const withEmail = await employeeRepo.retrieveByEmail(email);
 
@@ -95,15 +108,50 @@ export class EmployeeController {
 
       const isdefaultPassword = passwordManager.isDefaultPattern(password);
 
+      const token = jwtServices.encode({ uid: user.uid });
+
       if (isdefaultPassword) {
-        return res.status(208).json({ code: 'DEFAULTPASS' });
+        return res.status(208).json({ code: 'DEFAULTPASS', token });
       }
 
-      const token = jwtServices.encode({ uid: user.uid });
-      res.status(200).json({ token });
+      res.status(200).json({ token, user });
     } catch (error) {
       logservice.error(error);
       res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  private generaRandomCode() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  }
+
+  async forgotPassword(req: Request<object, object, ForgotPasswordInput>, res: Response) {
+    try {
+      const { email } = req.body;
+
+      const user = await employeeRepo.retrieveByEmail(email);
+
+      if (!user) {
+        return res.status(400).json({ error: 'Employee with this email does not exist' });
+      }
+
+      const resetCode = this.generaRandomCode();
+
+      const updatedUser: IEmployee = {
+        ...user,
+        reset_code: resetCode,
+      };
+
+      const result = await employeeRepo.update(updatedUser);
+
+      if (result !== true) {
+        return res.status(400);
+      }
+
+      return res.status(204);
+    } catch (error) {
+      logservice.error(error);
+      res.status(500).json({ error: error.message });
     }
   }
 }
