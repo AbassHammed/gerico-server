@@ -3,11 +3,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-
     env_file:
       - .env
     ports:
       - '5000:5000'
-
     volumes:
-      - .:/app:delegated s
+      - ./src:/app/src
+      - ./package.json:/app/package.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - /app/node_modules
