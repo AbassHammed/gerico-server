@@ -1,4 +1,5 @@
-# Restrict ownership of the CODEOWNERS
-/.github/CODEOWNERS @AbassHammed
+# Define ownership for the entire codebase
+* @AbassHammed
 
-@AbassHammed
+# Define ownership for the CODEOWNERS file itself
+/.github/CODEOWNERS @AbassHammed
