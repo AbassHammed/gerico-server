@@ -8,12 +8,12 @@ import dotenv from 'dotenv';
 // dotenv.config()
 // the process.env vars used in the './models/connect' file will be undefined which will cause connection errors
 dotenv.config();
-import express from 'express';
+import express, { Application } from 'express';
 import { logservice } from './services/loggerService';
 import employee from './repositories/employee';
 import Server from './routes';
 
-const app = express();
+const app: Application = express();
 const server: Server = new Server(app);
 const PORT = process.env.PORT || 5000;
 
@@ -54,7 +54,7 @@ app.get('/', (req, res) => {
 
 app.get('/test', (req, res) => {
   (async () => {
-    const result2 = await employee.retrieveByEmail('john.doe@exampl.com');
+    const result2 = await employee.retrieveByEmail('john.doe@example.com');
     return res.json({ result2 });
   })();
 });

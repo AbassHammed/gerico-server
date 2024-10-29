@@ -14,7 +14,7 @@ declare global {
   }
 }
 
-export const requireUser = async (req: Request, res: Response, next: NextFunction) => {
+export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
     let token: string;
 

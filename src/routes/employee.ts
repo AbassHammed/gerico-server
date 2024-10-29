@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { EmployeeController } from '../controllers/employee';
 import validateResource from '../middlewares/route-verif';
-import { createEmployeeSchema } from '../middlewares/employee.middleware';
+import { createEmployeeSchema, loginSchema } from '../middlewares/employee.middleware';
+import { requireAuth } from '../middlewares/protected-route';
 
 class EmployerRoutes {
   router = Router();
@@ -12,7 +13,13 @@ class EmployerRoutes {
   }
 
   initRoutes() {
-    this.router.post('/create', validateResource(createEmployeeSchema), this.controller.create);
+    this.router.post(
+      '/create',
+      requireAuth,
+      validateResource(createEmployeeSchema),
+      this.controller.create,
+    );
+    this.router.post('/login', validateResource(loginSchema), this.controller.login);
   }
 }
 
