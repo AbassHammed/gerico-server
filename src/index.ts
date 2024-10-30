@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import dotenv from 'dotenv';
 // The env variables needs to be configured here before importing any other file in the app entry
 // this allows each imported file that uses the env vars to have access to them
@@ -7,12 +8,13 @@ import dotenv from 'dotenv';
 // dotenv.config()
 // the process.env vars used in the './models/connect' file will be undefined which will cause connection errors
 dotenv.config();
-import express from 'express';
-const app = express();
+import express, { Application } from 'express';
 import { logservice } from './services/loggerService';
-import connection from './models/connect';
-import { ITest } from './models/interface';
+import employee from './repositories/employee';
+import Server from './routes';
 
+const app: Application = express();
+const server: Server = new Server(app);
 const PORT = process.env.PORT || 5000;
 
 app.get('/', (req, res) => {
@@ -50,22 +52,12 @@ app.get('/', (req, res) => {
   res.send(htmlContent);
 });
 
-function save(): Promise<ITest[]> {
-  return new Promise((resolve, reject) => {
-    connection.query<ITest[]>('SELECT * FROM test_table', (err, res) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(res);
-      }
-    });
-  });
-}
-
-(async () => {
-  const res = await save();
-  logservice.info(res[0].name);
-})();
+app.get('/test', (req, res) => {
+  (async () => {
+    const result2 = await employee.retrieveByEmail('john.doe@example.com');
+    return res.json({ result2 });
+  })();
+});
 
 app.listen(PORT, () => {
   logservice.info(`Express is listening at http://localhost:${PORT}`);

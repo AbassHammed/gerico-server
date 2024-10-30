@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import { Request, Response, NextFunction } from 'express';
 import jwtServices from '../services/jwtServices';
-import userRepo from '../repositories/user';
+import userRepo from '../repositories/employee';
 import { logservice } from '../services/loggerService';
 
 declare global {
@@ -14,7 +14,7 @@ declare global {
   }
 }
 
-export const requireUser = async (req: Request, res: Response, next: NextFunction) => {
+export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
     let token: string;
 
@@ -43,7 +43,7 @@ export const requireUser = async (req: Request, res: Response, next: NextFunctio
 
     next();
   } catch (error: any) {
-    logservice.info('Error in require user middleware', error.message);
-    res.status(401).json({ error: 'Internal server Error' });
+    logservice.error('Error in require user middleware', error.message);
+    res.status(401).json({ error: error.message });
   }
 };
