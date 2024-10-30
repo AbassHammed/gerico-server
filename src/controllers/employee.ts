@@ -14,6 +14,10 @@ import jwtServices from '../services/jwtServices';
 import emailServices from '../services/mail/mailServices';
 import { EEmailTemplate } from '../services/mail/mail';
 
+function generateRandomCode(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
 /**
 
 ```plaintext
@@ -82,7 +86,8 @@ export class EmployeeController {
           .json({ error: 'An error occured while creating the user, please try again' });
       }
 
-      // we may need to implement a services that retries sending the email for sometimes
+      // we may need to implement a services that retries sending the email for sometimes incase of error
+      // or maybe we need a better implementation
       const emailSent = await emailServices.sendTemplatedEmail(
         newEmployee.email,
         EEmailTemplate.WELCOME,
@@ -95,7 +100,7 @@ export class EmployeeController {
 
       if (!emailSent) {
         return res.status(201).json({
-          message: 'The employee has been created but we were not able to send them a mail;',
+          message: 'The employee has been created but we were not able to send them a mail',
         });
       }
 
@@ -140,10 +145,6 @@ export class EmployeeController {
     }
   }
 
-  private generaRandomCode() {
-    return Math.floor(100000 + Math.random() * 900000).toString();
-  }
-
   async forgotPassword(req: Request<object, object, ForgotPasswordInput>, res: Response) {
     try {
       const { email } = req.body;
@@ -154,7 +155,7 @@ export class EmployeeController {
         return res.status(400).json({ error: 'Employee with this email does not exist' });
       }
 
-      const resetCode = this.generaRandomCode();
+      const resetCode = generateRandomCode();
 
       const updatedUser: IEmployee = {
         ...user,
@@ -167,7 +168,13 @@ export class EmployeeController {
         return res.status(400);
       }
 
-      return res.status(204);
+      await emailServices.sendTemplatedEmail(user.email, EEmailTemplate.RESET_PASSWORD, {
+        civility: user.civility,
+        lastName: user.last_name,
+        code: resetCode,
+      });
+
+      res.status(201).json({ uid: updatedUser.uid });
     } catch (error) {
       logservice.error(error);
       res.status(500).json({ error: error.message });

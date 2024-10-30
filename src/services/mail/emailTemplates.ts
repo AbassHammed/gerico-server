@@ -8,7 +8,7 @@ export async function getTemplateContent(
     case EEmailTemplate.WELCOME: {
       const welcomeData = data as IWelcomeTemplate;
       return {
-        subject: 'Welcome to Gerico HR!',
+        subject: 'Welcome to Gerico',
         html: await welcomeTemplate(welcomeData),
       };
     }
@@ -43,18 +43,18 @@ async function welcomeTemplate({
       </head>
       <body>
         <div class="email-container">
-          <div class="header">Welcome to Gerico HR</div>
+          <div class="header">Welcome to Gerico</div>
           <div class="content">
             <p>Dear ${civility} ${lastName},</p>
-            <p>Welcome to the Gerico HR platform! We are thrilled to have you join us.</p>
+            <p>Welcome to the Gerico platform! We are thrilled to have you join us.</p>
             <p>Your account has been created successfully, and here is your default password:</p>
             <div style="font-size: 18px; font-weight: bold; background-color: #f4f4f4; padding: 10px; border-radius: 5px; display: inline-block;">
               ${defaultPass}
             </div>
             <p>For your security, please log in and change your password at your earliest convenience. Click the button below to get started.</p>
-            <a href="https://gericohr.com/login" class="button">Log In to Gerico HR</a>
+            <a href="https://gericohr.com/login" class="button">Log In to Gerico</a>
           </div>
-          <div class="footer">© 2024 Gerico HR. All rights reserved.</div>
+          <div class="footer">© 2024 Gerico. All rights reserved.</div>
         </div>
       </body>
     </html>
@@ -85,9 +85,9 @@ async function resetPasswordTemplate({
             <p>Dear ${civility} ${lastName},</p>
             <p>We received a request to reset your password. Please use the code below to proceed with resetting your password:</p>
             <div class="code">${code}</div>
-            <p>This code will expire in 15 minutes. If you did not request a password reset, please disregard this email or contact our support team.</p>
+            <p>If you did not request a password reset, please disregard this email or contact our support team.</p>
           </div>
-          <div class="footer">© 2024 Gerico HR. All rights reserved.</div>
+          <div class="footer">© 2024 Gerico. All rights reserved.</div>
         </div>
       </body>
     </html>

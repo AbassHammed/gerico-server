@@ -57,8 +57,25 @@ export const loginSchema = object({
   }),
 });
 
+export const resetPasswordSchema = object({
+  body: object({
+    uid: string({ required_error: 'UID is required' }),
+    reset_code: string({ required_error: 'Reset code is required' }),
+    password: string({ required_error: 'Password is required' }).min(
+      8,
+      'Password must be at least 8 characters long',
+    ),
+    confirm_password: string({ required_error: 'Confirm password is required' }),
+  }).refine(data => data.password === data.confirm_password, {
+    message: 'Passwords do not match',
+    path: ['confirm_password'],
+  }),
+});
+
 export type CreateEmployeeInput = Required<TypeOf<typeof createEmployeeSchema>['body']>;
 
 export type ForgotPasswordInput = TypeOf<typeof forgotPasswordSchema>['body'];
 
 export type LoginInput = TypeOf<typeof loginSchema>['body'];
+
+export type ResetPasswordInput = TypeOf<typeof resetPasswordSchema>['body'];
