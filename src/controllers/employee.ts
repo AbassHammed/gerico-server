@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import {
+  ChangeDefaultPasswordInput,
   CreateEmployeeInput,
   ForgotPasswordInput,
   LoginInput,
@@ -168,16 +169,57 @@ export class EmployeeController {
         return res.status(400);
       }
 
-      await emailServices.sendTemplatedEmail(user.email, EEmailTemplate.RESET_PASSWORD, {
-        civility: user.civility,
-        lastName: user.last_name,
-        code: resetCode,
-      });
+      const sent = await emailServices.sendTemplatedEmail(
+        user.email,
+        EEmailTemplate.RESET_PASSWORD,
+        {
+          civility: user.civility,
+          lastName: user.last_name,
+          code: resetCode,
+        },
+      );
 
-      res.status(201).json({ uid: updatedUser.uid });
+      res.status(201).json({ uid: updatedUser.uid, sent });
     } catch (error) {
       logservice.error(error);
       res.status(500).json({ error: error.message });
+    }
+  }
+
+  async changeDefaultPassword(
+    req: Request<object, object, ChangeDefaultPasswordInput>,
+    res: Response,
+  ) {
+    try {
+      const { password } = req.body;
+
+      const user = await employeeRepo.retrieveById(req.user.uid);
+
+      if (!user) {
+        return res.status(400).json({ error: 'Employee with this email does not exist' });
+      }
+
+      const salt = await bcryptjs.genSalt();
+      const hashedPassword = await bcryptjs.hash(password, salt);
+
+      const updatedUser: IEmployee = {
+        ...user,
+        password: hashedPassword,
+      };
+
+      const upadate = await employeeRepo.update(updatedUser);
+
+      if (upadate !== true) {
+        // This will never occur, cause the update method will either return true or trhow an error, but you error handling in case of incasity
+        return res.status(400).json({ error: 'The user could not be updated' });
+      }
+
+      const token = jwtServices.encode({ uid: updatedUser.uid });
+
+      res.status(200).json({ token, user: updatedUser });
+    } catch (error) {
+      logservice.error(error);
+      res.status(500).json({ error: 'An internal error occured' });
     }
   }
 }

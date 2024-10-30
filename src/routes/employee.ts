@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { EmployeeController } from '../controllers/employee';
 import validateResource from '../middlewares/route-verif';
 import {
+  changeDefaultPasswordSchema,
   createEmployeeSchema,
   forgotPasswordSchema,
   loginSchema,
@@ -28,6 +29,12 @@ class EmployerRoutes {
       '/forgot-password',
       validateResource(forgotPasswordSchema),
       this.controller.forgotPassword,
+    );
+    this.router.post(
+      '/change-default-password',
+      requireAuth,
+      validateResource(changeDefaultPasswordSchema),
+      this.controller.changeDefaultPassword,
     );
   }
 }

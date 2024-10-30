@@ -72,6 +72,19 @@ export const resetPasswordSchema = object({
   }),
 });
 
+// for simplification we are expecting the minimum critere for a password to be handle on the front, since we are also using zod there
+export const changeDefaultPasswordSchema = object({
+  body: object({
+    password: string({ required_error: 'Password is required' })
+      .min(8, 'Password must be at least 8 characters long')
+      .max(16, 'Password must be at most 16 characters long'),
+    confirmPassword: string({ required_error: 'Confirm password is required' }),
+  }).refine(data => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  }),
+});
+
 export type CreateEmployeeInput = Required<TypeOf<typeof createEmployeeSchema>['body']>;
 
 export type ForgotPasswordInput = TypeOf<typeof forgotPasswordSchema>['body'];
@@ -79,3 +92,5 @@ export type ForgotPasswordInput = TypeOf<typeof forgotPasswordSchema>['body'];
 export type LoginInput = TypeOf<typeof loginSchema>['body'];
 
 export type ResetPasswordInput = TypeOf<typeof resetPasswordSchema>['body'];
+
+export type ChangeDefaultPasswordInput = TypeOf<typeof changeDefaultPasswordSchema>['body'];
