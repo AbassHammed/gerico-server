@@ -11,6 +11,8 @@ import { IEmployee } from '../models/interface';
 import { generateUUIDv4 } from '../utils/misc';
 import { logservice } from '../services/loggerService';
 import jwtServices from '../services/jwtServices';
+import emailServices from '../services/mail/mailServices';
+import { EEmailTemplate } from '../services/mail/mail';
 
 /**
 
@@ -79,7 +81,24 @@ export class EmployeeController {
           .status(401)
           .json({ error: 'An error occured while creating the user, please try again' });
       }
-      // TODO: implement email services then send an email to the employee
+
+      // we may need to implement a services that retries sending the email for sometimes
+      const emailSent = await emailServices.sendTemplatedEmail(
+        newEmployee.email,
+        EEmailTemplate.WELCOME,
+        {
+          civility: newEmployee.civility,
+          lastName: newEmployee.last_name,
+          defaultPass: password,
+        },
+      );
+
+      if (!emailSent) {
+        return res.status(201).json({
+          message: 'The employee has been created but we were not able to send them a mail;',
+        });
+      }
+
       res.status(201).json({ message: 'The employee was successfully created.' });
     } catch (error) {
       logservice.info(error);
