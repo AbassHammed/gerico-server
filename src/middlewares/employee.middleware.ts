@@ -46,6 +46,8 @@ export const forgotPasswordSchema = object({
 
 export const loginSchema = object({
   body: object({
+    browser: string({ required_error: 'Browser is required' }),
+    os: string({ required_error: 'OS is required' }),
     email: string({
       required_error: 'Email is required',
     }).email('Not a valid email'),
