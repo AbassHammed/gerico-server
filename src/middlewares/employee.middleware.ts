@@ -74,7 +74,7 @@ export const resetPasswordSchema = object({
   }),
 });
 
-// for simplification we are expecting the minimum critere for a password to be handle on the front, since we are also using zod there
+// for simplification we are expect the minimum critere for a password to be handle on the front, since we are also using zod there
 export const changeDefaultPasswordSchema = object({
   body: object({
     password: string({ required_error: 'Password is required' })
@@ -87,6 +87,12 @@ export const changeDefaultPasswordSchema = object({
   }),
 });
 
+export const resendResetCodeSchema = object({
+  body: object({
+    uid: string({ required_error: 'UID is required' }),
+  }),
+});
+
 export type CreateEmployeeInput = Required<TypeOf<typeof createEmployeeSchema>['body']>;
 
 export type ForgotPasswordInput = TypeOf<typeof forgotPasswordSchema>['body'];
@@ -96,3 +102,5 @@ export type LoginInput = TypeOf<typeof loginSchema>['body'];
 export type ResetPasswordInput = TypeOf<typeof resetPasswordSchema>['body'];
 
 export type ChangeDefaultPasswordInput = TypeOf<typeof changeDefaultPasswordSchema>['body'];
+
+export type ResendResetPasswordCodeInput = TypeOf<typeof resendResetCodeSchema>['body'];

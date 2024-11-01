@@ -4,6 +4,7 @@ import {
   CreateEmployeeInput,
   ForgotPasswordInput,
   LoginInput,
+  ResendResetPasswordCodeInput,
   ResetPasswordInput,
 } from '../middlewares/employee.middleware';
 import employeeRepo from '../repositories/employee';
@@ -108,8 +109,7 @@ export class EmployeeController {
 
       res.status(201).json({ message: 'The employee was successfully created.' });
     } catch (error) {
-      logservice.info(error);
-
+      logservice.info('[create]', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   }
@@ -150,7 +150,7 @@ export class EmployeeController {
 
       res.status(200).json({ token, user });
     } catch (error) {
-      logservice.error(error);
+      logservice.error('[login]', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   }
@@ -191,7 +191,7 @@ export class EmployeeController {
 
       res.status(201).json({ uid: updatedUser.uid, sent });
     } catch (error) {
-      logservice.error(error);
+      logservice.error('[forgotPassword]', error);
       res.status(500).json({ error: error.message });
     }
   }
@@ -229,7 +229,7 @@ export class EmployeeController {
 
       res.status(200).json({ token, user: updatedUser });
     } catch (error) {
-      logservice.error(error);
+      logservice.error('[changeDefaultPassword]', error);
       res.status(500).json({ error: 'An internal error occured' });
     }
   }
@@ -266,8 +266,44 @@ export class EmployeeController {
 
       res.status(201).json({ result: true });
     } catch (error) {
-      logservice.error(error);
+      logservice.error('[resetPassword]', error);
       res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  async resendPasswordCode(
+    req: Request<object, object, ResendResetPasswordCodeInput>,
+    res: Response,
+  ) {
+    try {
+      const { uid } = req.body;
+
+      const user = await employeeRepo.retrieveById(uid);
+
+      if (!user) {
+        return res.status(400).json({ error: 'This user does not exist' });
+      }
+
+      if (!user.reset_code) {
+        return res.status(400).json({
+          error: 'You have not make any password change request for us to send you a code.',
+        });
+      }
+
+      const sent = await emailServices.sendTemplatedEmail(
+        user.email,
+        EEmailTemplate.RESET_PASSWORD,
+        {
+          civility: user.civility,
+          lastName: user.last_name,
+          code: user.reset_code,
+        },
+      );
+
+      res.status(200).json({ sent });
+    } catch (error) {
+      logservice.error('[resendPasswordCode]', error);
+      res.status(500).json({ error: 'An unknown error occured while resending the email.' });
     }
   }
 }
