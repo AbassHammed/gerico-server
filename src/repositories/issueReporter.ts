@@ -6,8 +6,8 @@ class IssueReporterRepository implements IRepository<IIssueReporter> {
   save(t: IIssueReporter): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query<ResultSetHeader>(
-        'INSERT INTO issues (issue_id, type, priority, subject, description, solved) VALUES( ?, ?, ?, ?, ?, ?)',
-        [t.issue_id, t.type, t.priority, t.subject, t.description, t.solved],
+        'INSERT INTO issues (issue_id, type, priority, subject, description, solved, issue_date) VALUES( ?, ?, ?, ?, ?, ?, ?)',
+        [t.issue_id, t.type, t.priority, t.subject, t.description, t.solved, t.issue_date],
         err => {
           if (err) {
             reject(err);

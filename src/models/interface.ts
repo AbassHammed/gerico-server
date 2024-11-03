@@ -37,6 +37,7 @@ export interface IIssueReporter {
   subject: string;
   description: string;
   solved: boolean;
+  issue_date: Date;
 }
 
 export interface IIssueReporterRow extends IIssueReporter, RowDataPacket {}
