@@ -30,6 +30,17 @@ export interface IEmployee {
   dependents: number;
 }
 
+export interface IIssueReporter {
+  issue_id: string;
+  type: 'auth' | 'leave' | 'payslip' | 'other';
+  priority: 'high' | 'average' | 'normal';
+  subject: string;
+  description: string;
+  solved: boolean;
+}
+
+export interface IIssueReporterRow extends IIssueReporter, RowDataPacket {}
+
 export interface IEmployeeRow extends IEmployee, RowDataPacket {}
 
 export interface IEmployeeLog extends RowDataPacket {
