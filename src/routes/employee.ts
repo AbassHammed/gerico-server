@@ -6,6 +6,8 @@ import {
   createEmployeeSchema,
   forgotPasswordSchema,
   loginSchema,
+  resendResetCodeSchema,
+  resetPasswordSchema,
 } from '../middlewares/employee.middleware';
 import { requireAuth } from '../middlewares/protected-route';
 
@@ -35,6 +37,16 @@ class EmployerRoutes {
       requireAuth,
       validateResource(changeDefaultPasswordSchema),
       this.controller.changeDefaultPassword,
+    );
+    this.router.post(
+      '/reset-password',
+      validateResource(resetPasswordSchema),
+      this.controller.resetPassword,
+    );
+    this.router.post(
+      '/resend-password-code',
+      validateResource(resendResetCodeSchema),
+      this.controller.resendPasswordCode,
     );
   }
 }

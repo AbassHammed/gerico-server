@@ -12,6 +12,14 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      MYSQL_USER: ${{ secrets.MYSQL_USER }}
+      MYSQL_PASS: ${{ secrets.MYSQL_PASSWORD }}
+      MYSQL_HOST: ${{ secrets.MYSQL_HOST }}
+      MYSQL_PORT: ${{ secrets.MYSQL_PORT }}
+      MYSQL_DB: ${{ secrets.MYSQL_DB }}
+      MYSQL_CA_CERT: ${{ secrets.MYSQL_CA_CERT }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
