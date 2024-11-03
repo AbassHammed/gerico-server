@@ -1,7 +1,7 @@
 {
   "name": "gerico-server",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "scripts": {
     "dev": "ts-node ./src/index.ts",
     "build": "tsc",
