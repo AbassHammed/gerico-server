@@ -8,12 +8,16 @@ class IssueReporterRouter {
   router = Router();
   controller = new IssueReporterController();
 
+  constructor() {
+    this.initRouter();
+  }
+
   initRouter() {
     this.router.post('/report', validateResource(createIssueSchema), this.controller.reportIssue);
     this.router.get('/get-issues', requireAuth, this.controller.getIssues);
     this.router.get('/get-not-solved', requireAuth, this.controller.getIssuesNotSolved);
     this.router.patch(
-      '/issues/:id/solved',
+      '/:id/solved',
       requireAuth,
       validateResource(updateIssueSchema),
       this.controller.markIssueAsSolved,
