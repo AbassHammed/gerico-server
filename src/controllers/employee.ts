@@ -10,7 +10,7 @@ import {
 import employeeRepo from '../repositories/employee';
 import bcryptjs from 'bcryptjs';
 import passwordManager from '../services/passwordManager';
-import { IEmployee } from '../models/interface';
+import { IUser } from '../models/interface';
 import { generateUUIDv4 } from '../utils/misc';
 import { logservice } from '../services/loggerService';
 import jwtServices from '../services/jwtServices';
@@ -43,7 +43,7 @@ function generateRandomCode(): string {
 export class EmployeeController {
   async create(req: Request<object, object, CreateEmployeeInput>, res: Response) {
     try {
-      const { email, last_name, dob, hire_date } = req.body;
+      const { email, last_name, date_of_birth, hire_date } = req.body;
 
       const admin = await employeeRepo.retrieveById(req.user.uid);
 
@@ -54,10 +54,10 @@ export class EmployeeController {
       const withEmail = await employeeRepo.retrieveByEmail(email);
 
       if (withEmail) {
-        return res.status(400).json({ error: 'The email already is already used' });
+        return res.status(400).json({ error: 'The email is already used' });
       }
 
-      const dateOfBirth = new Date(dob);
+      const dateOfBirth = new Date(date_of_birth);
 
       const hireDate = new Date(hire_date);
 
@@ -68,12 +68,12 @@ export class EmployeeController {
 
       const hashedPassword = await bcryptjs.hash(password, salt);
 
-      const newEmployee: IEmployee = {
+      const newEmployee: IUser = {
         ...req.body,
-        dob: dateOfBirth,
+        date_of_birth: dateOfBirth,
         hire_date: hireDate,
         uid: generateUUIDv4(),
-        password: hashedPassword,
+        hashed_password: hashedPassword,
         created_at: new Date(),
         updated_at: new Date(),
         is_archived: false,
@@ -126,7 +126,7 @@ export class EmployeeController {
           .json({ error: 'No user with the email provided.', code: 'ENOTFOUND' });
       }
 
-      const isPasswordCorrect = await bcryptjs.compare(password, user.password);
+      const isPasswordCorrect = await bcryptjs.compare(password, user.hashed_password);
 
       if (!isPasswordCorrect) {
         return res.status(400).json({ error: 'Incorrect password', code: 'EINCPASS' });
@@ -167,7 +167,7 @@ export class EmployeeController {
 
       const resetCode = generateRandomCode();
 
-      const updatedUser: IEmployee = {
+      const updatedUser: IUser = {
         ...user,
         reset_code: resetCode,
         updated_at: new Date(),
@@ -212,9 +212,9 @@ export class EmployeeController {
       const salt = await bcryptjs.genSalt();
       const hashedPassword = await bcryptjs.hash(password, salt);
 
-      const updatedUser: IEmployee = {
+      const updatedUser: IUser = {
         ...user,
-        password: hashedPassword,
+        hashed_password: hashedPassword,
         updated_at: new Date(),
       };
 
@@ -251,9 +251,9 @@ export class EmployeeController {
       const salt = await bcryptjs.genSalt();
       const hashedPassword = await bcryptjs.hash(password, salt);
 
-      const updatedUser: IEmployee = {
+      const updatedUser: IUser = {
         ...user,
-        password: hashedPassword,
+        hashed_password: hashedPassword,
         reset_code: null,
       };
 

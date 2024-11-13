@@ -14,25 +14,27 @@ export const createEmployeeSchema = object({
     phone_number: string({ required_error: 'Phone number is required' }),
     is_admin: boolean(),
     hire_date: string({ required_error: 'Hire date is required' }),
-    employee_post: literal('employee', {
+    job_title: literal('employee', {
       invalid_type_error: 'User post must be either "employee" or "manager"',
     }).or(
       literal('manager', {
         invalid_type_error: 'User post must be either "employee" or "manager"',
       }),
     ),
+    user_departement: string({ required_error: 'The user departement is required.' }),
     address_line1: string({ required_error: 'Address line 1 is required' }),
     address_line2: string().optional(),
     city: string({ required_error: 'City is required' }),
     state: string({ required_error: 'State is required' }),
     postal_code: string({ required_error: 'Postal code is required' }),
     country: string({ required_error: 'Country is required' }),
-    dob: string({ required_error: 'Date of birth is required' }),
-    ss_number: string({ required_error: 'Social security number is required' }),
-    work_hours_month: number({ required_error: 'Work hours per month is required' }),
-    contrat_type: string({ required_error: 'Contract type is required' }),
+    date_of_birth: string({ required_error: 'Date of birth is required' }),
+    social_security_number: string({ required_error: 'Social security number is required' }),
+    remaining_leave_balance: number({ required_error: 'Work hours per month is required' }),
+    contract_type: string({ required_error: 'Contract type is required' }),
     marital_status: string({ required_error: 'Marital status is required' }),
-    dependents: number({ required_error: 'Number of dependents is required' }),
+    dependants: number({ required_error: 'Number of dependents is required' }),
+    company_id: string({ required_error: 'company id is required' }).min(14).max(14),
   }),
 });
 

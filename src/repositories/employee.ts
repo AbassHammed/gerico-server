@@ -1,12 +1,12 @@
-import { IEmployee, IEmployeeRow, IRepository } from '../models/interface';
+import { IRepository, IUser, IUserRowData } from '../models/interface';
 import connection from '../models/connect';
 import { ResultSetHeader } from 'mysql2';
 
-class EmployeeRepository implements Required<IRepository<IEmployee>> {
-  save(t: IEmployee): Promise<true> {
+class EmployeeRepository implements Required<IRepository<IUser>> {
+  save(t: IUser): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query<ResultSetHeader>(
-        'INSERT INTO employees (uid, civility, first_name, last_name, email, phone_number, password, employee_post, is_admin, hire_date, created_at, updated_at, departure_date, is_archived, reset_code, address_line1, address_line2, city, state, postal_code, country, dob, ss_number, work_hours_month, contrat_type, marital_status, dependents) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO users (uid, civility, first_name, last_name, email, phone_number, hashed_password, job_title, user_departement, is_admin, hire_date, created_at, updated_at, departure_date, is_archived, reset_code, address_line1, address_line2, city,  postal_code, country, date_of_birth, social_security_number, remaining_leave_balance, contract_type, marital_status, dependants) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [
           t.uid,
           t.civility,
@@ -14,8 +14,9 @@ class EmployeeRepository implements Required<IRepository<IEmployee>> {
           t.last_name,
           t.email,
           t.phone_number,
-          t.password,
-          t.employee_post,
+          t.hashed_password,
+          t.job_title,
+          t.user_departement,
           t.is_admin,
           t.hire_date,
           t.created_at,
@@ -26,15 +27,14 @@ class EmployeeRepository implements Required<IRepository<IEmployee>> {
           t.address_line1,
           t.address_line2,
           t.city,
-          t.state,
           t.postal_code,
           t.country,
-          t.dob,
-          t.ss_number,
-          t.work_hours_month,
-          t.contrat_type,
+          t.date_of_birth,
+          t.social_security_number,
+          t.remaining_leave_balance,
+          t.contract_type,
           t.marital_status,
-          t.dependents,
+          t.dependants,
         ],
         err => {
           if (err) {
@@ -47,9 +47,9 @@ class EmployeeRepository implements Required<IRepository<IEmployee>> {
     });
   }
 
-  retrieveAll(): Promise<IEmployee[]> {
+  retrieveAll(): Promise<IUser[]> {
     return new Promise((resolve, reject) => {
-      connection.query<IEmployeeRow[]>('SELECT * FROM employees', (err, res) => {
+      connection.query<IUserRowData[]>('SELECT * FROM users', (err, res) => {
         if (err) {
           reject(err);
         } else {
@@ -59,26 +59,22 @@ class EmployeeRepository implements Required<IRepository<IEmployee>> {
     });
   }
 
-  retrieveById(id: string | number): Promise<IEmployee> {
+  retrieveById(id: string | number): Promise<IUser> {
     return new Promise((resolve, reject) => {
-      connection.query<IEmployeeRow[]>(
-        'SELECT * FROM employees WHERE uid = ?',
-        [id],
-        (err, res) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(res?.[0]);
-          }
-        },
-      );
+      connection.query<IUserRowData[]>('SELECT * FROM users WHERE uid = ?', [id], (err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res?.[0]);
+        }
+      });
     });
   }
 
-  retrieveByEmail(email: string): Promise<IEmployee> {
+  retrieveByEmail(email: string): Promise<IUser> {
     return new Promise((resolve, reject) => {
-      connection.query<IEmployeeRow[]>(
-        'SELECT * FROM employees WHERE email = ?',
+      connection.query<IUserRowData[]>(
+        'SELECT * FROM users WHERE email = ?',
         [email],
         (err, res) => {
           if (err) {
@@ -91,10 +87,10 @@ class EmployeeRepository implements Required<IRepository<IEmployee>> {
     });
   }
 
-  update(t: IEmployee): Promise<true> {
+  update(t: IUser): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query<ResultSetHeader>(
-        'UPDATE employees SET civility = ?, first_name = ?, last_name = ?, email = ?, phone_number = ?, password = ?, employee_post = ?, is_admin = ?, hire_date = ?, created_at = ?, updated_at = ?, departure_date = ?, is_archived = ?, reset_code = ?, address_line1 = ?, address_line2 = ?, city = ?, state = ?, postal_code = ?, country = ?, dob = ?, ss_number = ?, work_hours_month = ?, contrat_type = ?, marital_status = ?, dependents = ? WHERE uid = ?',
+        'UPDATE users SET civility = ?, first_name = ?, last_name = ?, email = ?, phone_number = ?, password = ?, employee_post = ?, is_admin = ?, hire_date = ?, created_at = ?, updated_at = ?, departure_date = ?, is_archived = ?, reset_code = ?, address_line1 = ?, address_line2 = ?, city = ?, state = ?, postal_code = ?, country = ?, dob = ?, ss_number = ?, work_hours_month = ?, contrat_type = ?, marital_status = ?, dependents = ? WHERE uid = ?',
         [
           t.civility,
           t.first_name,
@@ -137,7 +133,7 @@ class EmployeeRepository implements Required<IRepository<IEmployee>> {
 
   delete(id: string | number): Promise<true> {
     return new Promise((resolve, reject) => {
-      connection.query<ResultSetHeader>('DELETE FROM employees WHERE uid = ?', [id], err => {
+      connection.query<ResultSetHeader>('DELETE FROM users WHERE uid = ?', [id], err => {
         if (err) {
           reject(err);
         } else {
@@ -165,7 +161,7 @@ class EmployeeRepository implements Required<IRepository<IEmployee>> {
 
   deleteAll(): Promise<number> {
     return new Promise((resolve, reject) => {
-      connection.query<ResultSetHeader>('DELETE FROM employees', err => {
+      connection.query<ResultSetHeader>('DELETE FROM users', err => {
         if (err) {
           reject(err);
         } else {
