@@ -98,18 +98,19 @@ export interface ILeaveRequest extends RowDataPacket {
   reason: string;
 }
 
-export interface ICompany extends RowDataPacket {
+export interface ICompanyInfo {
   siret: string;
   code_ape: string;
   name: string;
   addr_line1: string;
   addr_line2?: string;
   city: string;
-  state: string;
   postal_code: string;
   country: string;
   convention_collective: string;
 }
+
+export interface ICompanyInfoRowData extends ICompanyInfo, RowDataPacket {}
 
 /**
  * Generic repository interface to provide basic CRUD operations

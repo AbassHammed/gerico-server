@@ -64,10 +64,11 @@ CREATE TABLE users_logs (
 );
 
 CREATE TABLE issue_reports (
-    issue_id VARCHAR(16) PRIMARY KEY,
-    issue_type ENUM('technique', 'fonctionnel', 'autre') NOT NULL,
-    priority ENUM('basse', 'moyenne', 'haute', 'critique') NOT NULL,
+    issue_id VARCHAR(36) PRIMARY KEY,
+    issue_type ENUM('auth', 'leave', 'payslip', 'other') NOT NULL,
+    priority ENUM('average', 'normal', 'high') NOT NULL,
     subject VARCHAR(50),
     message TEXT,
+    solved BOOLEAN DEFAULT FALSE,
     issue_date DATETIME DEFAULT CURRENT_TIMESTAMP
 );

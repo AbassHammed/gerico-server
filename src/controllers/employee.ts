@@ -45,11 +45,11 @@ export class EmployeeController {
     try {
       const { email, last_name, date_of_birth, hire_date } = req.body;
 
-      const admin = await employeeRepo.retrieveById(req.user.uid);
+      // const admin = await employeeRepo.retrieveById(req.user.uid);
 
-      if (!admin?.is_admin) {
-        return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
-      }
+      // if (!admin?.is_admin) {
+      //   return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
+      // }
 
       const withEmail = await employeeRepo.retrieveByEmail(email);
 

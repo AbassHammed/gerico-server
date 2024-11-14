@@ -1,11 +1,11 @@
-import { ICompany, IRepository } from '../models/interface';
+import { ICompanyInfo, ICompanyInfoRowData, IRepository } from '../models/interface';
 import connection from '../models/connect';
 
-class CompanyRepository implements IRepository<ICompany> {
-  save(data: ICompany): Promise<true> {
+class CompanyRepository implements IRepository<ICompanyInfo> {
+  save(data: ICompanyInfo): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query(
-        'INSERT INTO company (siret, code_ape, name, addr_line1, addr_line2, city, state, postal_code, country, convention_collective) VALUES( ?,?,?,?,?,?,?,?,?,?)',
+        'INSERT INTO company_info (siret, code_ape, name, addr_line1, addr_line2, city, postal_code, country, convention_collective) VALUES( ?,?,?,?,?,?,?,?,?)',
         [
           data.siret,
           data.code_ape,
@@ -13,7 +13,6 @@ class CompanyRepository implements IRepository<ICompany> {
           data.addr_line1,
           data.addr_line2,
           data.city,
-          data.state,
           data.postal_code,
           data.country,
           data.convention_collective,
@@ -29,29 +28,32 @@ class CompanyRepository implements IRepository<ICompany> {
     });
   }
 
-  retrieveById(siret: string | number): Promise<ICompany> {
+  retrieveById(siret: string | number): Promise<ICompanyInfo> {
     return new Promise((resolve, reject) => {
-      connection.query<ICompany[]>('SELECT * FROM company WHERE siret = ?', [siret], (err, res) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(res?.[0]);
-        }
-      });
+      connection.query<ICompanyInfoRowData[]>(
+        'SELECT * FROM company_info WHERE siret = ?',
+        [siret],
+        (err, res) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(res?.[0]);
+          }
+        },
+      );
     });
   }
 
-  update(data: ICompany): Promise<true> {
+  update(data: ICompanyInfo): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query(
-        'UPDATE company SET code_ape = ?, name = ?, addr_line1 = ?, addr_line2 = ?, city = ?, state = ?, postal_code = ?, country = ?, convention_collective = ? WHERE siret = ?',
+        'UPDATE company_info SET code_ape = ?, name = ?, addr_line1 = ?, addr_line2 = ?, city = ?, postal_code = ?, country = ?, convention_collective = ? WHERE siret = ?',
         [
           data.code_ape,
           data.name,
           data.addr_line1,
           data.addr_line2,
           data.city,
-          data.state,
           data.postal_code,
           data.country,
           data.convention_collective,
@@ -70,7 +72,7 @@ class CompanyRepository implements IRepository<ICompany> {
 
   delete(siret: string | number): Promise<true> {
     return new Promise((resolve, reject) => {
-      connection.query('DELETE FROM company WHERE siret = ?', [siret], err => {
+      connection.query('DELETE FROM company_info WHERE siret = ?', [siret], err => {
         if (err) {
           reject(err);
         } else {

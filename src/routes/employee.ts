@@ -22,7 +22,7 @@ class EmployerRoutes {
   initRoutes() {
     this.router.post(
       '/create',
-      requireAuth,
+      // requireAuth,
       validateResource(createEmployeeSchema),
       this.controller.create,
     );
