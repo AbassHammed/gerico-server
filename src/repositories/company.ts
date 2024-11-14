@@ -5,13 +5,13 @@ class CompanyRepository implements IRepository<ICompanyInfo> {
   save(data: ICompanyInfo): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query(
-        'INSERT INTO company_info (siret, code_ape, name, addr_line1, addr_line2, city, postal_code, country, convention_collective) VALUES( ?,?,?,?,?,?,?,?,?)',
+        'INSERT INTO company_info (siret, code_ape, name, address_line1, address_line2, city, postal_code, country, collective_convention) VALUES( ?,?,?,?,?,?,?,?,?)',
         [
           data.siret,
           data.code_ape,
           data.name,
-          data.addr_line1,
-          data.addr_line2,
+          data.address_line1,
+          data.address_line2,
           data.city,
           data.postal_code,
           data.country,
@@ -47,12 +47,12 @@ class CompanyRepository implements IRepository<ICompanyInfo> {
   update(data: ICompanyInfo): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query(
-        'UPDATE company_info SET code_ape = ?, name = ?, addr_line1 = ?, addr_line2 = ?, city = ?, postal_code = ?, country = ?, convention_collective = ? WHERE siret = ?',
+        'UPDATE company_info SET code_ape = ?, name = ?, address_line1 = ?, address_line2 = ?, city = ?, postal_code = ?, country = ?, collective_convention = ? WHERE siret = ?',
         [
           data.code_ape,
           data.name,
-          data.addr_line1,
-          data.addr_line2,
+          data.address_line1,
+          data.address_line2,
           data.city,
           data.postal_code,
           data.country,

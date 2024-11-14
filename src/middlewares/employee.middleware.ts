@@ -1,4 +1,4 @@
-import { object, string, literal, TypeOf, number, boolean } from 'zod';
+import { object, string, TypeOf, number, boolean } from 'zod';
 
 export const createEmployeeSchema = object({
   body: object({
@@ -14,18 +14,11 @@ export const createEmployeeSchema = object({
     phone_number: string({ required_error: 'Phone number is required' }),
     is_admin: boolean(),
     hire_date: string({ required_error: 'Hire date is required' }),
-    job_title: literal('employee', {
-      invalid_type_error: 'User post must be either "employee" or "manager"',
-    }).or(
-      literal('manager', {
-        invalid_type_error: 'User post must be either "employee" or "manager"',
-      }),
-    ),
-    user_departement: string({ required_error: 'The user departement is required.' }),
+    job_title: string({ required_error: 'Job title is required' }),
+    job_department: string({ required_error: 'The user departement is required.' }),
     address_line1: string({ required_error: 'Address line 1 is required' }),
     address_line2: string().optional(),
     city: string({ required_error: 'City is required' }),
-    state: string({ required_error: 'State is required' }),
     postal_code: string({ required_error: 'Postal code is required' }),
     country: string({ required_error: 'Country is required' }),
     date_of_birth: string({ required_error: 'Date of birth is required' }),

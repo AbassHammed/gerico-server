@@ -10,7 +10,7 @@ export interface IUser {
   hashed_password: string;
   is_admin: boolean;
   job_title: string;
-  user_departement: string;
+  job_department: string;
   remaining_leave_balance: number;
   hire_date: Date;
   created_at: Date;
@@ -102,8 +102,8 @@ export interface ICompanyInfo {
   siret: string;
   code_ape: string;
   name: string;
-  addr_line1: string;
-  addr_line2?: string;
+  address_line1: string;
+  address_line2?: string;
   city: string;
   postal_code: string;
   country: string;

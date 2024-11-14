@@ -22,7 +22,7 @@ class EmployerRoutes {
   initRoutes() {
     this.router.post(
       '/create',
-      // requireAuth,
+      requireAuth,
       validateResource(createEmployeeSchema),
       this.controller.create,
     );
@@ -47,6 +47,12 @@ class EmployerRoutes {
       '/resend-password-code',
       validateResource(resendResetCodeSchema),
       this.controller.resendPasswordCode,
+    );
+    this.router.patch(
+      '/:uid/update',
+      requireAuth,
+      validateResource(createEmployeeSchema),
+      this.controller.update,
     );
   }
 }

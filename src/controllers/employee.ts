@@ -306,4 +306,40 @@ export class EmployeeController {
       res.status(500).json({ error: 'An unknown error occured while resending the email.' });
     }
   }
+
+  async update(req: Request<any, object, CreateEmployeeInput>, res: Response) {
+    try {
+      const { uid } = req.params as { uid: string };
+      const trimmedUid = uid.trim();
+      logservice.info('uid', uid);
+
+      const user = await employeeRepo.retrieveById(trimmedUid);
+
+      if (!user) {
+        return res.status(400).json({ error: 'The user does not exist' });
+      }
+
+      const hire_date = new Date(req.body.hire_date);
+      const date_of_birth = new Date(req.body.date_of_birth);
+
+      const updatedUser: IUser = {
+        ...user,
+        ...req.body,
+        hire_date,
+        date_of_birth,
+        updated_at: new Date(),
+      };
+
+      const result = await employeeRepo.update(updatedUser);
+
+      if (result !== true) {
+        return res.status(400).json({ error: 'The user could not be updated' });
+      }
+
+      res.status(200).json({ result: true });
+    } catch (error) {
+      logservice.error('[update]', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
 }

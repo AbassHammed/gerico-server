@@ -1,12 +1,13 @@
 import { IRepository, IUser, IUserRowData } from '../models/interface';
 import connection from '../models/connect';
 import { ResultSetHeader } from 'mysql2';
+import { logservice } from '../services/loggerService';
 
 class EmployeeRepository implements Required<IRepository<IUser>> {
   save(t: IUser): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query<ResultSetHeader>(
-        'INSERT INTO users (uid, civility, first_name, last_name, email, phone_number, hashed_password, job_title, user_departement, is_admin, hire_date, created_at, updated_at, departure_date, is_archived, reset_code, address_line1, address_line2, city,  postal_code, country, date_of_birth, social_security_number, remaining_leave_balance, contract_type, marital_status, dependants) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO users (uid, civility, first_name, last_name, email, phone_number, hashed_password, job, job_department, is_admin, hire_date, created_at, updated_at, departure_date, is_archived, reset_code, address_line1, address_line2, city,  postal_code, country, date_of_birth, social_security_number, remaining_leave_balance, contract_type, marital_status, dependants, company_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [
           t.uid,
           t.civility,
@@ -16,7 +17,7 @@ class EmployeeRepository implements Required<IRepository<IUser>> {
           t.phone_number,
           t.hashed_password,
           t.job_title,
-          t.user_departement,
+          t.job_department,
           t.is_admin,
           t.hire_date,
           t.created_at,
@@ -35,6 +36,7 @@ class EmployeeRepository implements Required<IRepository<IUser>> {
           t.contract_type,
           t.marital_status,
           t.dependants,
+          t.company_id,
         ],
         err => {
           if (err) {
@@ -62,6 +64,7 @@ class EmployeeRepository implements Required<IRepository<IUser>> {
   retrieveById(id: string | number): Promise<IUser> {
     return new Promise((resolve, reject) => {
       connection.query<IUserRowData[]>('SELECT * FROM users WHERE uid = ?', [id], (err, res) => {
+        logservice.info('EmployeeRepository:retrieveById', res, id);
         if (err) {
           reject(err);
         } else {
@@ -90,7 +93,7 @@ class EmployeeRepository implements Required<IRepository<IUser>> {
   update(t: IUser): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query<ResultSetHeader>(
-        'UPDATE users SET civility = ?, first_name = ?, last_name = ?, email = ?, phone_number = ?, hashed_password = ?, job_title = ?, user_departement = ?, is_admin = ?, hire_date = ?, created_at = ?, updated_at = ?, departure_date = ?, is_archived = ?, reset_code = ?, address_line1 = ?, address_line2 = ?, city = ?, postal_code = ?, country = ?, date_of_birth = ?, social_security_number = ?, remaining_leave_balance = ?, contract_type = ?, marital_status = ?, dependants = ? WHERE uid = ?',
+        'UPDATE users SET civility = ?, first_name = ?, last_name = ?, email = ?, phone_number = ?, hashed_password = ?, job = ?, job_department = ?, is_admin = ?, hire_date = ?, created_at = ?, updated_at = ?, departure_date = ?, is_archived = ?, reset_code = ?, address_line1 = ?, address_line2 = ?, city = ?, postal_code = ?, country = ?, date_of_birth = ?, social_security_number = ?, remaining_leave_balance = ?, contract_type = ?, marital_status = ?, dependants = ?, company_id = ? WHERE uid = ?',
         [
           t.civility,
           t.first_name,
@@ -99,7 +102,7 @@ class EmployeeRepository implements Required<IRepository<IUser>> {
           t.phone_number,
           t.hashed_password,
           t.job_title,
-          t.user_departement,
+          t.job_department,
           t.is_admin,
           t.hire_date,
           t.created_at,
@@ -118,6 +121,7 @@ class EmployeeRepository implements Required<IRepository<IUser>> {
           t.contract_type,
           t.marital_status,
           t.dependants,
+          t.company_id,
           t.uid,
         ],
         err => {
