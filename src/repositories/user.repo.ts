@@ -3,7 +3,7 @@ import connection from '../models/connect';
 import { ResultSetHeader } from 'mysql2';
 import { logservice } from '../services/loggerService';
 
-class EmployeeRepository implements Required<IRepository<IUser>> {
+class UserRepository implements Required<IRepository<IUser>> {
   save(t: IUser): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query<ResultSetHeader>(
@@ -176,4 +176,4 @@ class EmployeeRepository implements Required<IRepository<IUser>> {
   }
 }
 
-export default new EmployeeRepository();
+export default new UserRepository();

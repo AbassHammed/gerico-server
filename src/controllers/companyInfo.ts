@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import CompanyRepository from '../repositories/company';
-import userRepository from '../repositories/employee';
+import CompanyRepository from '../repositories/company.repo';
+import userRepository from '../repositories/user.repo';
 import { CompanyInfoBodyType } from '../middlewares/companyInfo.middleware';
 
 async function checkAdmin(adminId: string) {

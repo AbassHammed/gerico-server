@@ -5,7 +5,7 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 import { ResultSetHeader } from 'mysql2';
 import connection from '../src/models/connect';
-import EmployeeRepository from '../src/repositories/employee';
+import EmployeeRepository from '../src/repositories/user.repo';
 import { IEmployee } from '../src/models/interface';
 
 describe('EmployeeRepository', () => {

@@ -1,7 +1,7 @@
 import { ICompanyInfo, ICompanyInfoRowData, IRepository } from '../models/interface';
 import connection from '../models/connect';
 
-class CompanyRepository implements IRepository<ICompanyInfo> {
+class CompanyInfoRepository implements IRepository<ICompanyInfo> {
   save(data: ICompanyInfo): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query(
@@ -83,4 +83,4 @@ class CompanyRepository implements IRepository<ICompanyInfo> {
   }
 }
 
-export default new CompanyRepository();
+export default new CompanyInfoRepository();

@@ -7,7 +7,7 @@ import {
   ResendResetPasswordCodeInput,
   ResetPasswordInput,
 } from '../middlewares/employee.middleware';
-import employeeRepo from '../repositories/employee';
+import employeeRepo from '../repositories/user.repo';
 import bcryptjs from 'bcryptjs';
 import passwordManager from '../services/passwordManager';
 import { IUser } from '../models/interface';
