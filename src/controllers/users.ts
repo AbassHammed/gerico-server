@@ -7,7 +7,7 @@ import {
   ResendResetPasswordCodeInput,
   ResetPasswordInput,
 } from '../middlewares/employee.middleware';
-import employeeRepo from '../repositories/users';
+import usersRepo from '../repositories/users';
 import bcryptjs from 'bcryptjs';
 import passwordManager from '../services/passwordManager';
 import { IUser } from '../models/interface';
@@ -45,13 +45,13 @@ export class UsersController {
     try {
       const { email, last_name, date_of_birth, hire_date } = req.body;
 
-      const admin = await employeeRepo.retrieveById(req.user.uid);
+      const admin = await usersRepo.retrieveById(req.user.uid);
 
       if (!admin?.is_admin) {
         return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
       }
 
-      const withEmail = await employeeRepo.retrieveByEmail(email);
+      const withEmail = await usersRepo.retrieveByEmail(email);
 
       if (withEmail) {
         return res.status(400).json({ error: 'The email is already used' });
@@ -81,7 +81,7 @@ export class UsersController {
         departure_date: null,
       };
 
-      const result = await employeeRepo.save(newEmployee);
+      const result = await usersRepo.save(newEmployee);
 
       if (result !== true) {
         return res
@@ -118,7 +118,7 @@ export class UsersController {
     try {
       const { email, password, os, browser } = req.body;
 
-      const user = await employeeRepo.retrieveByEmail(email);
+      const user = await usersRepo.retrieveByEmail(email);
 
       if (!user) {
         return res
@@ -159,7 +159,7 @@ export class UsersController {
     try {
       const { email } = req.body;
 
-      const user = await employeeRepo.retrieveByEmail(email);
+      const user = await usersRepo.retrieveByEmail(email);
 
       if (!user) {
         return res.status(400).json({ error: 'Employee with this email does not exist' });
@@ -173,7 +173,7 @@ export class UsersController {
         updated_at: new Date(),
       };
 
-      const result = await employeeRepo.update(updatedUser);
+      const result = await usersRepo.update(updatedUser);
 
       if (result !== true) {
         return res.status(400);
@@ -203,7 +203,7 @@ export class UsersController {
     try {
       const { password } = req.body;
 
-      const user = await employeeRepo.retrieveById(req.user.uid);
+      const user = await usersRepo.retrieveById(req.user.uid);
 
       if (!user) {
         return res.status(400).json({ error: 'Employee with this email does not exist' });
@@ -218,10 +218,10 @@ export class UsersController {
         updated_at: new Date(),
       };
 
-      const upadate = await employeeRepo.update(updatedUser);
+      const upadate = await usersRepo.update(updatedUser);
 
       if (upadate !== true) {
-        // This will never occur, cause the update method will either return true or trhow an error, but you know error handling in case of incasity
+        // This will never occur, cause the update method will either return true or throw an error, but you know error handling in case of incasity
         return res.status(400).json({ error: 'The user could not be updated' });
       }
 
@@ -238,7 +238,7 @@ export class UsersController {
     try {
       const { uid, password, reset_code } = req.body;
 
-      const user = await employeeRepo.retrieveById(uid);
+      const user = await usersRepo.retrieveById(uid);
 
       if (!user) {
         return res.status(401).json({ error: 'The user does not exist' });
@@ -257,7 +257,7 @@ export class UsersController {
         reset_code: null,
       };
 
-      const result = await employeeRepo.update(updatedUser);
+      const result = await usersRepo.update(updatedUser);
 
       if (result !== true) {
         // as explained above, !!! never going to happen
@@ -278,7 +278,7 @@ export class UsersController {
     try {
       const { uid } = req.body;
 
-      const user = await employeeRepo.retrieveById(uid);
+      const user = await usersRepo.retrieveById(uid);
 
       if (!user) {
         return res.status(400).json({ error: 'This user does not exist' });
@@ -311,9 +311,8 @@ export class UsersController {
     try {
       const { uid } = req.params as { uid: string };
       const trimmedUid = uid.trim();
-      logservice.info('uid', uid);
 
-      const user = await employeeRepo.retrieveById(trimmedUid);
+      const user = await usersRepo.retrieveById(trimmedUid);
 
       if (!user) {
         return res.status(400).json({ error: 'The user does not exist' });
@@ -330,7 +329,7 @@ export class UsersController {
         updated_at: new Date(),
       };
 
-      const result = await employeeRepo.update(updatedUser);
+      const result = await usersRepo.update(updatedUser);
 
       if (result !== true) {
         return res.status(400).json({ error: 'The user could not be updated' });
@@ -339,6 +338,41 @@ export class UsersController {
       res.status(200).json({ result: true });
     } catch (error) {
       logservice.error('[update]', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  async retrieve(req: Request, res: Response) {
+    try {
+      const { uid } = req.params as { uid: string };
+      const trimmedUid = uid.trim();
+
+      const user = await usersRepo.retrieveById(trimmedUid);
+
+      if (!user) {
+        return res.status(400).json({ error: 'The user does not exist' });
+      }
+
+      res.status(200).json({ user });
+    } catch (error) {
+      logservice.error('[retrieve]', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  async retrieveAll(req: Request, res: Response) {
+    try {
+      const admin = await usersRepo.retrieveById(req.user.uid);
+
+      if (!admin?.is_admin) {
+        return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
+      }
+
+      const users = await usersRepo.retrieveAll();
+
+      res.status(200).json({ users });
+    } catch (error) {
+      logservice.error('[retrieveAll]', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   }
