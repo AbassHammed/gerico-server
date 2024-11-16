@@ -7,7 +7,7 @@ import {
   ResendResetPasswordCodeInput,
   ResetPasswordInput,
 } from '../middlewares/employee.middleware';
-import employeeRepo from '../repositories/user.repo';
+import employeeRepo from '../repositories/users';
 import bcryptjs from 'bcryptjs';
 import passwordManager from '../services/passwordManager';
 import { IUser } from '../models/interface';
@@ -40,16 +40,16 @@ function generateRandomCode(): string {
  * https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
  */
 
-export class EmployeeController {
+export class UsersController {
   async create(req: Request<object, object, CreateEmployeeInput>, res: Response) {
     try {
       const { email, last_name, date_of_birth, hire_date } = req.body;
 
-      // const admin = await employeeRepo.retrieveById(req.user.uid);
+      const admin = await employeeRepo.retrieveById(req.user.uid);
 
-      // if (!admin?.is_admin) {
-      //   return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
-      // }
+      if (!admin?.is_admin) {
+        return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
+      }
 
       const withEmail = await employeeRepo.retrieveByEmail(email);
 

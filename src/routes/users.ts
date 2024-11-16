@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { EmployeeController } from '../controllers/employee';
+import { UsersController } from '../controllers/users';
 import validateResource from '../middlewares/route-verif';
 import {
   changeDefaultPasswordSchema,
@@ -11,9 +11,9 @@ import {
 } from '../middlewares/employee.middleware';
 import { requireAuth } from '../middlewares/protected-route';
 
-class EmployerRoutes {
+class UsersRoutes {
   router = Router();
-  controller = new EmployeeController();
+  controller = new UsersController();
 
   constructor() {
     this.initRoutes();
@@ -57,4 +57,4 @@ class EmployerRoutes {
   }
 }
 
-export default new EmployerRoutes().router;
+export default new UsersRoutes().router;
