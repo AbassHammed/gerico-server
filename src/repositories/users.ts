@@ -1,7 +1,6 @@
 import { IRepository, IUser, IUserRowData } from '../models/interface';
 import connection from '../models/connect';
 import { ResultSetHeader } from 'mysql2';
-import { logservice } from '../services/loggerService';
 
 class UserRepository implements Required<IRepository<IUser>> {
   save(t: IUser): Promise<true> {
@@ -64,7 +63,6 @@ class UserRepository implements Required<IRepository<IUser>> {
   retrieveById(id: string | number): Promise<IUser> {
     return new Promise((resolve, reject) => {
       connection.query<IUserRowData[]>('SELECT * FROM users WHERE uid = ?', [id], (err, res) => {
-        logservice.info('EmployeeRepository:retrieveById', res, id);
         if (err) {
           reject(err);
         } else {

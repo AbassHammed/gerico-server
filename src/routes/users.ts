@@ -54,6 +54,7 @@ class UsersRoutes {
       validateResource(createEmployeeSchema),
       this.controller.update,
     );
+    this.router.get('/me', requireAuth, this.controller.getUser);
     this.router.get('/:uid', requireAuth, this.controller.retrieve);
     this.router.get('/', requireAuth, this.controller.retrieveAll);
   }

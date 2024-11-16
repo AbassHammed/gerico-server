@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Request, Response } from 'express';
 import {
   ChangeDefaultPasswordInput,
@@ -136,13 +137,13 @@ export class UsersController {
 
       const token = jwtServices.encode({ uid: user.uid });
 
-      await emailServices.sendTemplatedEmail(user.email, EEmailTemplate.CONNECTION_ALERT, {
-        civility: user.civility,
-        lastName: user.last_name,
-        browser: browser,
-        operatingSystem: os,
-        loginDate: new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' }),
-      });
+      // await emailServices.sendTemplatedEmail(user.email, EEmailTemplate.CONNECTION_ALERT, {
+      //   civility: user.civility,
+      //   lastName: user.last_name,
+      //   browser: browser,
+      //   operatingSystem: os,
+      //   loginDate: new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' }),
+      // });
 
       if (isdefaultPassword) {
         return res.status(208).json({ code: 'DEFAULTPASS', token });
@@ -373,6 +374,21 @@ export class UsersController {
       res.status(200).json({ users });
     } catch (error) {
       logservice.error('[retrieveAll]', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  async getUser(req: Request, res: Response) {
+    try {
+      const user = await usersRepo.retrieveById(req.user.uid);
+
+      if (!user) {
+        return res.status(400).json({ error: `The user does not exist` });
+      }
+
+      res.status(200).json({ user });
+    } catch (error) {
+      logservice.error('[getUser]', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   }
