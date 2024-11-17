@@ -15,7 +15,7 @@ class CompanyInfoRepository implements IRepository<ICompanyInfo> {
           data.city,
           data.postal_code,
           data.country,
-          data.convention_collective,
+          data.collective_convention,
         ],
         err => {
           if (err) {
@@ -56,7 +56,7 @@ class CompanyInfoRepository implements IRepository<ICompanyInfo> {
           data.city,
           data.postal_code,
           data.country,
-          data.convention_collective,
+          data.collective_convention,
           data.siret,
         ],
         err => {

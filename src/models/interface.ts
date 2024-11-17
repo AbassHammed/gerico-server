@@ -107,7 +107,7 @@ export interface ICompanyInfo {
   city: string;
   postal_code: string;
   country: string;
-  convention_collective: string;
+  collective_convention: string;
 }
 
 export interface ICompanyInfoRowData extends ICompanyInfo, RowDataPacket {}

@@ -19,7 +19,7 @@ class CompanyInfoRouter {
       validateResource(createCompanyInfoSchema),
       this.controller.create,
     );
-    this.router.post(
+    this.router.patch(
       '/update',
       requireAuth,
       validateResource(createCompanyInfoSchema),

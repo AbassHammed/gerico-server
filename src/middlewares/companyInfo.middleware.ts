@@ -11,7 +11,7 @@ export const createCompanyInfoSchema = object({
     city: string().min(1, { message: 'La ville est requise' }),
     postal_code: string().min(1, { message: 'Le code postal est requis' }),
     country: string().min(1, { message: 'Le pays est requis' }),
-    convention_collective: string(),
+    collective_convention: string(),
   }),
 });
 
