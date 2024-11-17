@@ -10,7 +10,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import express, { Application } from 'express';
 import { logservice } from './services/loggerService';
-import employee from './repositories/employee';
+import employee from './repositories/users';
 import Server from './routes';
 
 const app: Application = express();

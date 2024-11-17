@@ -1,12 +1,14 @@
 import express, { Application } from 'express';
-import employeeRoutes from './employee';
+import usersRoutes from './users';
 import issueReporterRoutes from './issueReporter';
 import cors, { CorsOptions } from 'cors';
+import companyInfoRoutes from './companyInfo';
 
 class Routes {
   constructor(app: Application) {
-    app.use('/api/employee', employeeRoutes);
+    app.use('/api/users', usersRoutes);
     app.use('/api/issues', issueReporterRoutes);
+    app.use('/api/company', companyInfoRoutes);
   }
 }
 

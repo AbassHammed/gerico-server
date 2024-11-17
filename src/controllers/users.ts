@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Request, Response } from 'express';
 import {
   ChangeDefaultPasswordInput,
@@ -7,10 +8,10 @@ import {
   ResendResetPasswordCodeInput,
   ResetPasswordInput,
 } from '../middlewares/employee.middleware';
-import employeeRepo from '../repositories/employee';
+import usersRepo from '../repositories/users';
 import bcryptjs from 'bcryptjs';
 import passwordManager from '../services/passwordManager';
-import { IEmployee } from '../models/interface';
+import { IUser } from '../models/interface';
 import { generateUUIDv4 } from '../utils/misc';
 import { logservice } from '../services/loggerService';
 import jwtServices from '../services/jwtServices';
@@ -40,24 +41,24 @@ function generateRandomCode(): string {
  * https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
  */
 
-export class EmployeeController {
+export class UsersController {
   async create(req: Request<object, object, CreateEmployeeInput>, res: Response) {
     try {
-      const { email, last_name, dob, hire_date } = req.body;
+      const { email, last_name, date_of_birth, hire_date } = req.body;
 
-      const admin = await employeeRepo.retrieveById(req.user.uid);
+      const admin = await usersRepo.retrieveById(req.user.uid);
 
       if (!admin?.is_admin) {
         return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
       }
 
-      const withEmail = await employeeRepo.retrieveByEmail(email);
+      const withEmail = await usersRepo.retrieveByEmail(email);
 
       if (withEmail) {
-        return res.status(400).json({ error: 'The email already is already used' });
+        return res.status(400).json({ error: 'The email is already used' });
       }
 
-      const dateOfBirth = new Date(dob);
+      const dateOfBirth = new Date(date_of_birth);
 
       const hireDate = new Date(hire_date);
 
@@ -68,12 +69,12 @@ export class EmployeeController {
 
       const hashedPassword = await bcryptjs.hash(password, salt);
 
-      const newEmployee: IEmployee = {
+      const newEmployee: IUser = {
         ...req.body,
-        dob: dateOfBirth,
+        date_of_birth: dateOfBirth,
         hire_date: hireDate,
         uid: generateUUIDv4(),
-        password: hashedPassword,
+        hashed_password: hashedPassword,
         created_at: new Date(),
         updated_at: new Date(),
         is_archived: false,
@@ -81,7 +82,7 @@ export class EmployeeController {
         departure_date: null,
       };
 
-      const result = await employeeRepo.save(newEmployee);
+      const result = await usersRepo.save(newEmployee);
 
       if (result !== true) {
         return res
@@ -118,7 +119,7 @@ export class EmployeeController {
     try {
       const { email, password, os, browser } = req.body;
 
-      const user = await employeeRepo.retrieveByEmail(email);
+      const user = await usersRepo.retrieveByEmail(email);
 
       if (!user) {
         return res
@@ -126,7 +127,7 @@ export class EmployeeController {
           .json({ error: 'No user with the email provided.', code: 'ENOTFOUND' });
       }
 
-      const isPasswordCorrect = await bcryptjs.compare(password, user.password);
+      const isPasswordCorrect = await bcryptjs.compare(password, user.hashed_password);
 
       if (!isPasswordCorrect) {
         return res.status(400).json({ error: 'Incorrect password', code: 'EINCPASS' });
@@ -136,13 +137,13 @@ export class EmployeeController {
 
       const token = jwtServices.encode({ uid: user.uid });
 
-      await emailServices.sendTemplatedEmail(user.email, EEmailTemplate.CONNECTION_ALERT, {
-        civility: user.civility,
-        lastName: user.last_name,
-        browser: browser,
-        operatingSystem: os,
-        loginDate: new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' }),
-      });
+      // await emailServices.sendTemplatedEmail(user.email, EEmailTemplate.CONNECTION_ALERT, {
+      //   civility: user.civility,
+      //   lastName: user.last_name,
+      //   browser: browser,
+      //   operatingSystem: os,
+      //   loginDate: new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' }),
+      // });
 
       if (isdefaultPassword) {
         return res.status(208).json({ code: 'DEFAULTPASS', token });
@@ -159,7 +160,7 @@ export class EmployeeController {
     try {
       const { email } = req.body;
 
-      const user = await employeeRepo.retrieveByEmail(email);
+      const user = await usersRepo.retrieveByEmail(email);
 
       if (!user) {
         return res.status(400).json({ error: 'Employee with this email does not exist' });
@@ -167,13 +168,13 @@ export class EmployeeController {
 
       const resetCode = generateRandomCode();
 
-      const updatedUser: IEmployee = {
+      const updatedUser: IUser = {
         ...user,
         reset_code: resetCode,
         updated_at: new Date(),
       };
 
-      const result = await employeeRepo.update(updatedUser);
+      const result = await usersRepo.update(updatedUser);
 
       if (result !== true) {
         return res.status(400);
@@ -203,7 +204,7 @@ export class EmployeeController {
     try {
       const { password } = req.body;
 
-      const user = await employeeRepo.retrieveById(req.user.uid);
+      const user = await usersRepo.retrieveById(req.user.uid);
 
       if (!user) {
         return res.status(400).json({ error: 'Employee with this email does not exist' });
@@ -212,16 +213,16 @@ export class EmployeeController {
       const salt = await bcryptjs.genSalt();
       const hashedPassword = await bcryptjs.hash(password, salt);
 
-      const updatedUser: IEmployee = {
+      const updatedUser: IUser = {
         ...user,
-        password: hashedPassword,
+        hashed_password: hashedPassword,
         updated_at: new Date(),
       };
 
-      const upadate = await employeeRepo.update(updatedUser);
+      const upadate = await usersRepo.update(updatedUser);
 
       if (upadate !== true) {
-        // This will never occur, cause the update method will either return true or trhow an error, but you know error handling in case of incasity
+        // This will never occur, cause the update method will either return true or throw an error, but you know error handling in case of incasity
         return res.status(400).json({ error: 'The user could not be updated' });
       }
 
@@ -238,7 +239,7 @@ export class EmployeeController {
     try {
       const { uid, password, reset_code } = req.body;
 
-      const user = await employeeRepo.retrieveById(uid);
+      const user = await usersRepo.retrieveById(uid);
 
       if (!user) {
         return res.status(401).json({ error: 'The user does not exist' });
@@ -251,13 +252,13 @@ export class EmployeeController {
       const salt = await bcryptjs.genSalt();
       const hashedPassword = await bcryptjs.hash(password, salt);
 
-      const updatedUser: IEmployee = {
+      const updatedUser: IUser = {
         ...user,
-        password: hashedPassword,
+        hashed_password: hashedPassword,
         reset_code: null,
       };
 
-      const result = await employeeRepo.update(updatedUser);
+      const result = await usersRepo.update(updatedUser);
 
       if (result !== true) {
         // as explained above, !!! never going to happen
@@ -278,7 +279,7 @@ export class EmployeeController {
     try {
       const { uid } = req.body;
 
-      const user = await employeeRepo.retrieveById(uid);
+      const user = await usersRepo.retrieveById(uid);
 
       if (!user) {
         return res.status(400).json({ error: 'This user does not exist' });
@@ -304,6 +305,91 @@ export class EmployeeController {
     } catch (error) {
       logservice.error('[resendPasswordCode]', error);
       res.status(500).json({ error: 'An unknown error occured while resending the email.' });
+    }
+  }
+
+  async update(req: Request<any, object, CreateEmployeeInput>, res: Response) {
+    try {
+      const { uid } = req.params as { uid: string };
+      const trimmedUid = uid.trim();
+
+      const user = await usersRepo.retrieveById(trimmedUid);
+
+      if (!user) {
+        return res.status(400).json({ error: 'The user does not exist' });
+      }
+
+      const hire_date = new Date(req.body.hire_date);
+      const date_of_birth = new Date(req.body.date_of_birth);
+
+      const updatedUser: IUser = {
+        ...user,
+        ...req.body,
+        hire_date,
+        date_of_birth,
+        updated_at: new Date(),
+      };
+
+      const result = await usersRepo.update(updatedUser);
+
+      if (result !== true) {
+        return res.status(400).json({ error: 'The user could not be updated' });
+      }
+
+      res.status(200).json({ result: true });
+    } catch (error) {
+      logservice.error('[update]', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  async retrieve(req: Request, res: Response) {
+    try {
+      const { uid } = req.params as { uid: string };
+      const trimmedUid = uid.trim();
+
+      const user = await usersRepo.retrieveById(trimmedUid);
+
+      if (!user) {
+        return res.status(400).json({ error: 'The user does not exist' });
+      }
+
+      res.status(200).json({ user });
+    } catch (error) {
+      logservice.error('[retrieve]', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  async retrieveAll(req: Request, res: Response) {
+    try {
+      const admin = await usersRepo.retrieveById(req.user.uid);
+
+      if (!admin?.is_admin) {
+        return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
+      }
+
+      const users = await usersRepo.retrieveAll();
+
+      res.status(200).json({ users });
+    } catch (error) {
+      logservice.error('[retrieveAll]', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  async getUser(req: Request, res: Response) {
+    try {
+      const user = await usersRepo.retrieveById(req.user.uid);
+
+      if (!user) {
+        return res.status(400).json({ error: `The user does not exist` });
+      }
+
+      res.status(200).json({ user });
+    } catch (error) {
+      logservice.error('[getUser]', error);
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 }

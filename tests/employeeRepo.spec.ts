@@ -5,8 +5,8 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 import { ResultSetHeader } from 'mysql2';
 import connection from '../src/models/connect';
-import EmployeeRepository from '../src/repositories/employee';
-import { IEmployee } from '../src/models/interface';
+import EmployeeRepository from '../src/repositories/users';
+import { IUser } from '../src/models/interface';
 
 describe('EmployeeRepository', () => {
   let queryStub: sinon.SinonStub;
@@ -19,15 +19,15 @@ describe('EmployeeRepository', () => {
     queryStub.restore();
   });
 
-  const mockEmployee: IEmployee = {
+  const mockEmployee: IUser = {
     uid: '1',
     civility: 'Mr',
     first_name: 'John',
     last_name: 'Doe',
     email: 'john.doe@example.com',
     phone_number: '123456789',
-    password: 'password',
-    employee_post: 'manager',
+    hashed_password: 'password',
+    job_title: 'manager',
     is_admin: true,
     hire_date: new Date(),
     created_at: new Date(),
@@ -38,15 +38,16 @@ describe('EmployeeRepository', () => {
     address_line1: '123 Main St',
     address_line2: null,
     city: 'Sample City',
-    state: 'State',
     postal_code: '12345',
     country: 'Country',
-    dob: new Date('1980-01-01'),
-    ss_number: '123-45-6789',
-    work_hours_month: 160,
-    contrat_type: 'Permanent',
+    date_of_birth: new Date('1980-01-01'),
+    social_security_number: '123-45-6789',
+    remaining_leave_balance: 160,
+    contract_type: 'Permanent',
     marital_status: 'Single',
-    dependents: 0,
+    dependants: 0,
+    company_id: '1',
+    job_department: 'IT',
   };
 
   it('should save a new employee', async () => {

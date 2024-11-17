@@ -1,5 +1,38 @@
 import { RowDataPacket } from 'mysql2';
 
+export interface IUser {
+  uid: string;
+  civility: string;
+  first_name: string;
+  last_name: string;
+  phone_number: string;
+  email: string;
+  hashed_password: string;
+  is_admin: boolean;
+  job_title: string;
+  job_department: string;
+  remaining_leave_balance: number;
+  hire_date: Date;
+  created_at: Date;
+  updated_at: Date;
+  departure_date?: Date;
+  is_archived: boolean;
+  reset_code?: string;
+  address_line1: string;
+  address_line2?: string;
+  city: string;
+  postal_code: string;
+  country: string;
+  date_of_birth: Date;
+  social_security_number: string;
+  marital_status: string;
+  contract_type: string;
+  dependants: number;
+  company_id: string;
+}
+
+export interface IUserRowData extends IUser, RowDataPacket {}
+
 export interface IEmployee {
   uid: string;
   civility: string;
@@ -9,7 +42,10 @@ export interface IEmployee {
   phone_number: string;
   password: string;
   employee_post: 'employee' | 'manager';
-  is_admin: boolean; // ce champ me parait redondant par rapport au `employee_post` mais on peut justifier sa presence par le fait que l'entreprise peut decider de laisser seulement certains manager de gerer les congées et fdp
+  // ce champ me parait redondant par rapport au `employee_post` mais on peut
+  //justifier sa presence par le fait que l'entreprise peut decider de laisser
+  //seulement certains manager de gerer les congées et fdp
+  is_admin: boolean;
   hire_date: Date;
   created_at: Date;
   updated_at: Date;
@@ -62,18 +98,19 @@ export interface ILeaveRequest extends RowDataPacket {
   reason: string;
 }
 
-export interface ICompany extends RowDataPacket {
+export interface ICompanyInfo {
   siret: string;
   code_ape: string;
   name: string;
-  addr_line1: string;
-  addr_line2?: string;
+  address_line1: string;
+  address_line2?: string;
   city: string;
-  state: string;
   postal_code: string;
   country: string;
-  convention_collective: string;
+  collective_convention: string;
 }
+
+export interface ICompanyInfoRowData extends ICompanyInfo, RowDataPacket {}
 
 /**
  * Generic repository interface to provide basic CRUD operations

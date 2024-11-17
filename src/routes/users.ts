@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { EmployeeController } from '../controllers/employee';
+import { UsersController } from '../controllers/users';
 import validateResource from '../middlewares/route-verif';
 import {
   changeDefaultPasswordSchema,
@@ -11,9 +11,9 @@ import {
 } from '../middlewares/employee.middleware';
 import { requireAuth } from '../middlewares/protected-route';
 
-class EmployerRoutes {
+class UsersRoutes {
   router = Router();
-  controller = new EmployeeController();
+  controller = new UsersController();
 
   constructor() {
     this.initRoutes();
@@ -48,7 +48,16 @@ class EmployerRoutes {
       validateResource(resendResetCodeSchema),
       this.controller.resendPasswordCode,
     );
+    this.router.patch(
+      '/:uid/update',
+      requireAuth,
+      validateResource(createEmployeeSchema),
+      this.controller.update,
+    );
+    this.router.get('/me', requireAuth, this.controller.getUser);
+    this.router.get('/:uid', requireAuth, this.controller.retrieve);
+    this.router.get('/', requireAuth, this.controller.retrieveAll);
   }
 }
 
-export default new EmployerRoutes().router;
+export default new UsersRoutes().router;
