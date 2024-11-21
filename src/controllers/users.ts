@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Request, Response } from 'express';
 import {
   ChangeDefaultPasswordInput,
@@ -15,8 +14,7 @@ import { IUser } from '../models/interface';
 import { generateUUIDv4 } from '../utils/misc';
 import { logservice } from '../services/loggerService';
 import jwtServices from '../services/jwtServices';
-import emailServices from '../services/mail/mailServices';
-import { EEmailTemplate } from '../services/mail/mail';
+import emailService from '../services/mail/mailServices';
 
 function generateRandomCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -92,21 +90,11 @@ export class UsersController {
 
       // we may need to implement a services that retries sending the email for sometimes incase of error
       // or maybe we need a better implementation
-      const emailSent = await emailServices.sendTemplatedEmail(
-        newEmployee.email,
-        EEmailTemplate.WELCOME,
-        {
-          civility: newEmployee.civility,
-          lastName: newEmployee.last_name,
-          defaultPass: password,
-        },
-      );
-
-      if (!emailSent) {
-        return res.status(201).json({
-          message: 'The employee has been created but we were not able to send them a mail',
-        });
-      }
+      await emailService.sendWelcomeEmail(newEmployee.email, {
+        civility: newEmployee.civility,
+        lastName: newEmployee.last_name,
+        defaultPass: password,
+      });
 
       res.status(201).json({ message: 'The employee was successfully created.' });
     } catch (error) {
@@ -137,13 +125,13 @@ export class UsersController {
 
       const token = jwtServices.encode({ uid: user.uid });
 
-      // await emailServices.sendTemplatedEmail(user.email, EEmailTemplate.CONNECTION_ALERT, {
-      //   civility: user.civility,
-      //   lastName: user.last_name,
-      //   browser: browser,
-      //   operatingSystem: os,
-      //   loginDate: new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' }),
-      // });
+      await emailService.sendConnectionAlertEmail(user.email, {
+        civility: user.civility,
+        lastName: user.last_name,
+        loginDate: new Date().toISOString(),
+        operatingSystem: os,
+        browser,
+      });
 
       if (isdefaultPassword) {
         return res.status(208).json({ code: 'DEFAULTPASS', token });
@@ -180,17 +168,13 @@ export class UsersController {
         return res.status(400);
       }
 
-      const sent = await emailServices.sendTemplatedEmail(
-        user.email,
-        EEmailTemplate.RESET_PASSWORD,
-        {
-          civility: user.civility,
-          lastName: user.last_name,
-          code: resetCode,
-        },
-      );
+      await emailService.sendResetPasswordEmail(updatedUser.email, {
+        civility: updatedUser.civility,
+        lastName: updatedUser.last_name,
+        code: updatedUser.reset_code,
+      });
 
-      res.status(201).json({ uid: updatedUser.uid, sent });
+      res.status(201).json({ uid: updatedUser.uid, sent: true });
     } catch (error) {
       logservice.error('[forgotPassword]', error);
       res.status(500).json({ error: error.message });
@@ -291,17 +275,13 @@ export class UsersController {
         });
       }
 
-      const sent = await emailServices.sendTemplatedEmail(
-        user.email,
-        EEmailTemplate.RESET_PASSWORD,
-        {
-          civility: user.civility,
-          lastName: user.last_name,
-          code: user.reset_code,
-        },
-      );
+      await emailService.sendResetPasswordEmail(user.email, {
+        civility: user.civility,
+        lastName: user.last_name,
+        code: user.reset_code,
+      });
 
-      res.status(200).json({ sent });
+      res.status(200).json({ sent: true });
     } catch (error) {
       logservice.error('[resendPasswordCode]', error);
       res.status(500).json({ error: 'An unknown error occured while resending the email.' });

@@ -1,0 +1,27 @@
+<html>
+  <head>
+    <style>
+      body { font-family: Arial, sans-serif; color: #333; background-color: #f4f4f4; }
+      .email-container { max-width: 600px; margin: 20px auto; background: white; border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); } .header { background-color: #0073e6; color:
+      white; padding: 20px; text-align: center; font-size: 24px; } .content { padding: 20px; color:
+      #555; line-height: 1.6; } .password-box { font-size: 18px; font-weight: bold;
+      background-color: #f4f4f4; padding: 10px; border-radius: 5px; display: inline-block;
+      margin-top: 15px; } .footer { background-color: #f4f4f4; color: #666; padding: 10px;
+      text-align: center; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <div class='email-container'>
+      <div class='header'>Bienvenue chez Gerico</div>
+      <div class='content'>
+        <p>Bonjour {{civility}} {{lastName}},</p>
+        <p>Nous sommes ravis de vous accueillir chez Gerico. Votre compte a été créé avec succès.</p>
+        <p>Voici votre mot de passe par défaut :</p>
+        <div class='password-box'>{{defaultPass}}</div>
+        <p>Veuillez vous connecter et changer votre mot de passe dès que possible.</p>
+      </div>
+      <div class='footer'>© 2024 Gérico. Tous droits réservés.</div>
+    </div>
+  </body>
+</html>
