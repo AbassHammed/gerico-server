@@ -21,7 +21,7 @@ class UsersRoutes {
 
   initRoutes() {
     this.router.post(
-      '/create',
+      '/',
       requireAuth,
       validateResource(createEmployeeSchema),
       this.controller.create,
@@ -49,7 +49,7 @@ class UsersRoutes {
       this.controller.resendPasswordCode,
     );
     this.router.patch(
-      '/:uid/update',
+      '/:uid',
       requireAuth,
       validateResource(createEmployeeSchema),
       this.controller.update,
