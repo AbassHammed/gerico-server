@@ -372,4 +372,87 @@ export class UsersController {
       res.status(500).json({ error: 'Internal server error' });
     }
   }
+
+  async resetToDefaultPassword(req: Request, res: Response) {
+    try {
+      const user = await usersRepo.retrieveById(req.user.uid);
+
+      if (!user.is_admin) {
+        return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
+      }
+
+      const { uid } = req.params as { uid: string };
+      const trimmedUid = uid.trim();
+      const userToUpadate = await usersRepo.retrieveById(trimmedUid);
+
+      if (!userToUpadate) {
+        return res.status(400).json({ error: `The user does not exist` });
+      }
+
+      const password = passwordManager.generateDefaultPassword(
+        userToUpadate.last_name,
+        userToUpadate.date_of_birth,
+      );
+
+      const salt = await bcryptjs.genSalt();
+      const hashedPassword = await bcryptjs.hash(password, salt);
+
+      const updatedUser: IUser = {
+        ...userToUpadate,
+        hashed_password: hashedPassword,
+        updated_at: new Date(),
+      };
+
+      const result = await usersRepo.update(updatedUser);
+
+      if (result !== true) {
+        return res.status(400).json({ error: 'The user could not be updated' });
+      }
+
+      res.status(200).json({ result: true });
+    } catch (error) {
+      logservice.error('[resetToDefaultPassword]', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  async resendWelcomeEmail(req: Request, res: Response) {
+    try {
+      const user = await usersRepo.retrieveById(req.user.uid);
+
+      if (!user.is_admin) {
+        return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
+      }
+
+      const { uid } = req.params as { uid: string };
+      const trimmedUid = uid.trim();
+      const userToSendEmail = await usersRepo.retrieveById(trimmedUid);
+
+      if (!userToSendEmail) {
+        return res.status(400).json({ error: `The user does not exist` });
+      }
+
+      const password = passwordManager.generateDefaultPassword(
+        userToSendEmail.last_name,
+        userToSendEmail.date_of_birth,
+      );
+
+      const isDefaultPassword = await bcryptjs.compare(password, userToSendEmail.hashed_password);
+
+      if (!isDefaultPassword) {
+        return res.status(400).json({ error: 'The user has already changed the password' });
+      }
+
+      await emailService.sendWelcomeEmail(userToSendEmail.email, {
+        civility: userToSendEmail.civility,
+        lastName: userToSendEmail.last_name,
+        defaultPass: password,
+      });
+
+      res.status(200).json({ sent: true, message: 'The email was successfully sent' });
+    } catch (error) {
+      logservice.error('[resendWelcomeEmail]', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
 }

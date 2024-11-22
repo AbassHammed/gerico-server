@@ -48,6 +48,7 @@ class UsersRoutes {
       validateResource(resendResetCodeSchema),
       this.controller.resendPasswordCode,
     );
+    this.router.post('/resend-welcome-email/:uid', requireAuth, this.controller.resendWelcomeEmail);
     this.router.patch(
       '/:uid',
       requireAuth,
