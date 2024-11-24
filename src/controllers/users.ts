@@ -11,7 +11,7 @@ import usersRepo from '../repositories/users';
 import bcryptjs from 'bcryptjs';
 import passwordManager from '../services/passwordManager';
 import { IUser } from '../models/interface';
-import { generateUUIDv4 } from '../utils/misc';
+import { generateId } from '../utils/misc';
 import { logservice } from '../services/loggerService';
 import jwtServices from '../services/jwtServices';
 import emailService from '../services/mail/mailServices';
@@ -71,7 +71,7 @@ export class UsersController {
         ...req.body,
         date_of_birth: dateOfBirth,
         hire_date: hireDate,
-        uid: generateUUIDv4(),
+        uid: generateId(),
         hashed_password: hashedPassword,
         created_at: new Date(),
         updated_at: new Date(),
@@ -290,6 +290,12 @@ export class UsersController {
 
   async update(req: Request<any, object, CreateEmployeeInput>, res: Response) {
     try {
+      const admin = await usersRepo.retrieveById(req.user.uid);
+
+      if (!admin?.is_admin) {
+        return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
+      }
+
       const { uid } = req.params as { uid: string };
       const trimmedUid = uid.trim();
 
@@ -452,6 +458,39 @@ export class UsersController {
       res.status(200).json({ sent: true, message: 'The email was successfully sent' });
     } catch (error) {
       logservice.error('[resendWelcomeEmail]', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  async archiveUser(req: Request, res: Response) {
+    try {
+      const user = await usersRepo.retrieveById(req.user.uid);
+
+      if (!user.is_admin) {
+        return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
+      }
+
+      const { uid } = req.params as { uid: string };
+      const trimmedUid = uid.trim();
+      const userToArchive = await usersRepo.retrieveById(trimmedUid);
+
+      if (!userToArchive) {
+        return res.status(400).json({ error: `The user does not exist` });
+      }
+
+      if (userToArchive.is_archived) {
+        return res.status(400).json({ error: `The user is already archived` });
+      }
+
+      const result = await usersRepo.archive(trimmedUid);
+
+      if (result !== true) {
+        return res.status(400).json({ error: 'The user could not be archived' });
+      }
+
+      res.status(200).json({ result: true, message: 'The user was successfully archived' });
+    } catch (error) {
+      logservice.error('[archiveUser]', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   }

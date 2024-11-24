@@ -5,11 +5,11 @@ import connection from '../src/models/connect';
 import IssueReporterRepository from '../src/repositories/issueReporter';
 import { ResultSetHeader } from 'mysql2';
 import { IIssueReporter } from '../src/models/interface';
-import { generateUUIDv4 } from '../src/utils/misc';
+import { generateId } from '../src/utils/misc';
 
 describe('IssueReporterRepository', () => {
   let queryStub: sinon.SinonStub;
-  const id = generateUUIDv4();
+  const id = generateId();
 
   const mockIssue: IIssueReporter = {
     issue_id: id,

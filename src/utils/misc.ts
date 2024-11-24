@@ -2,12 +2,23 @@ export function isString(str: unknown): str is string {
   return typeof str === 'string';
 }
 
+// we can't use this function, doesn't looks url friendly on the front
 export function generateUUIDv4(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
     const r = (Math.random() * 16) | 0;
     const v = c === 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
+}
+
+export function generateId(): string {
+  // Using only lowercase letters (26 possibilities per character)
+  // We'll use 24 characters to get log2(26^24) ≈ 112 bits of entropy
+  const chars = 'abcdefghijklmnopqrstuvwxyz';
+  const length = 24;
+  return Array.from(crypto.getRandomValues(new Uint8Array(length)))
+    .map(x => chars[x % chars.length])
+    .join('');
 }
 
 /**

@@ -148,7 +148,7 @@ class UserRepository implements Required<IRepository<IUser>> {
   archive(id: string | number): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query<ResultSetHeader>(
-        'UPDATE employees SET is_archived = true WHERE uid = ?',
+        'UPDATE users SET is_archived = true WHERE uid = ?',
         [id],
         err => {
           if (err) {

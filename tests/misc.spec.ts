@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { isString, generateUUIDv4, _format, isNumber, shuffle } from '../src/utils/misc';
+import { isString, _format, isNumber, shuffle, generateId } from '../src/utils/misc';
 
 describe('isString', () => {
   it('should return true for a valid string', () => {
@@ -23,16 +23,37 @@ describe('isString', () => {
   });
 });
 
-describe('generateUUIDv4', () => {
-  it('should generate a valid UUID v4 string', () => {
-    const uuid = generateUUIDv4();
-    assert.match(uuid, /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+describe('generateId', () => {
+  it('should generate a 24-character lowercase string', () => {
+    const id = generateId();
+    assert.match(id, /^[a-z]{24}$/);
   });
 
-  it('should generate unique UUIDs each time', () => {
-    const uuid1 = generateUUIDv4();
-    const uuid2 = generateUUIDv4();
-    assert.notStrictEqual(uuid1, uuid2);
+  it('should generate unique IDs each time', () => {
+    const id1 = generateId();
+    const id2 = generateId();
+    assert.notStrictEqual(id1, id2);
+  });
+
+  it('should only contain lowercase letters', () => {
+    const id = generateId();
+    assert.strictEqual(id, id.toLowerCase());
+  });
+
+  it('should always be 24 characters long', () => {
+    const id = generateId();
+    assert.strictEqual(id.length, 24);
+  });
+
+  // This test verifies the distribution of characters
+  it('should use the full alphabet', () => {
+    // Generate multiple IDs to check character distribution
+    const ids = Array.from({ length: 100 }, () => generateId());
+    const allChars = ids.join('');
+
+    // Check that all letters a-z are used
+    const uniqueChars = new Set(allChars);
+    assert.strictEqual(uniqueChars.size, 26);
   });
 });
 
