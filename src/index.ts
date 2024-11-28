@@ -22,7 +22,7 @@ app.get('/', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Server Status</title>
+        <title>Server</title>
         <style>
             body {
                 font-family: sans-serif;
