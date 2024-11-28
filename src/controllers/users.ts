@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Request, Response } from 'express';
 import {
   ChangeDefaultPasswordInput,
@@ -12,11 +11,10 @@ import usersRepo from '../repositories/users';
 import bcryptjs from 'bcryptjs';
 import passwordManager from '../services/passwordManager';
 import { IUser } from '../models/interface';
-import { generateUUIDv4 } from '../utils/misc';
+import { generateId } from '../utils/misc';
 import { logservice } from '../services/loggerService';
 import jwtServices from '../services/jwtServices';
-import emailServices from '../services/mail/mailServices';
-import { EEmailTemplate } from '../services/mail/mail';
+import emailService from '../services/mail/mailServices';
 
 function generateRandomCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -73,7 +71,7 @@ export class UsersController {
         ...req.body,
         date_of_birth: dateOfBirth,
         hire_date: hireDate,
-        uid: generateUUIDv4(),
+        uid: generateId(),
         hashed_password: hashedPassword,
         created_at: new Date(),
         updated_at: new Date(),
@@ -92,21 +90,11 @@ export class UsersController {
 
       // we may need to implement a services that retries sending the email for sometimes incase of error
       // or maybe we need a better implementation
-      const emailSent = await emailServices.sendTemplatedEmail(
-        newEmployee.email,
-        EEmailTemplate.WELCOME,
-        {
-          civility: newEmployee.civility,
-          lastName: newEmployee.last_name,
-          defaultPass: password,
-        },
-      );
-
-      if (!emailSent) {
-        return res.status(201).json({
-          message: 'The employee has been created but we were not able to send them a mail',
-        });
-      }
+      await emailService.sendWelcomeEmail(newEmployee.email, {
+        civility: newEmployee.civility,
+        lastName: newEmployee.last_name,
+        defaultPass: password,
+      });
 
       res.status(201).json({ message: 'The employee was successfully created.' });
     } catch (error) {
@@ -137,13 +125,13 @@ export class UsersController {
 
       const token = jwtServices.encode({ uid: user.uid });
 
-      // await emailServices.sendTemplatedEmail(user.email, EEmailTemplate.CONNECTION_ALERT, {
-      //   civility: user.civility,
-      //   lastName: user.last_name,
-      //   browser: browser,
-      //   operatingSystem: os,
-      //   loginDate: new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' }),
-      // });
+      await emailService.sendConnectionAlertEmail(user.email, {
+        civility: user.civility,
+        lastName: user.last_name,
+        loginDate: new Date().toISOString(),
+        operatingSystem: os,
+        browser,
+      });
 
       if (isdefaultPassword) {
         return res.status(208).json({ code: 'DEFAULTPASS', token });
@@ -180,17 +168,13 @@ export class UsersController {
         return res.status(400);
       }
 
-      const sent = await emailServices.sendTemplatedEmail(
-        user.email,
-        EEmailTemplate.RESET_PASSWORD,
-        {
-          civility: user.civility,
-          lastName: user.last_name,
-          code: resetCode,
-        },
-      );
+      await emailService.sendResetPasswordEmail(updatedUser.email, {
+        civility: updatedUser.civility,
+        lastName: updatedUser.last_name,
+        code: updatedUser.reset_code,
+      });
 
-      res.status(201).json({ uid: updatedUser.uid, sent });
+      res.status(201).json({ uid: updatedUser.uid, sent: true });
     } catch (error) {
       logservice.error('[forgotPassword]', error);
       res.status(500).json({ error: error.message });
@@ -291,17 +275,13 @@ export class UsersController {
         });
       }
 
-      const sent = await emailServices.sendTemplatedEmail(
-        user.email,
-        EEmailTemplate.RESET_PASSWORD,
-        {
-          civility: user.civility,
-          lastName: user.last_name,
-          code: user.reset_code,
-        },
-      );
+      await emailService.sendResetPasswordEmail(user.email, {
+        civility: user.civility,
+        lastName: user.last_name,
+        code: user.reset_code,
+      });
 
-      res.status(200).json({ sent });
+      res.status(200).json({ sent: true });
     } catch (error) {
       logservice.error('[resendPasswordCode]', error);
       res.status(500).json({ error: 'An unknown error occured while resending the email.' });
@@ -310,6 +290,12 @@ export class UsersController {
 
   async update(req: Request<any, object, CreateEmployeeInput>, res: Response) {
     try {
+      const admin = await usersRepo.retrieveById(req.user.uid);
+
+      if (!admin?.is_admin) {
+        return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
+      }
+
       const { uid } = req.params as { uid: string };
       const trimmedUid = uid.trim();
 
@@ -389,6 +375,122 @@ export class UsersController {
       res.status(200).json({ user });
     } catch (error) {
       logservice.error('[getUser]', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  async resetToDefaultPassword(req: Request, res: Response) {
+    try {
+      const user = await usersRepo.retrieveById(req.user.uid);
+
+      if (!user.is_admin) {
+        return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
+      }
+
+      const { uid } = req.params as { uid: string };
+      const trimmedUid = uid.trim();
+      const userToUpadate = await usersRepo.retrieveById(trimmedUid);
+
+      if (!userToUpadate) {
+        return res.status(400).json({ error: `The user does not exist` });
+      }
+
+      const password = passwordManager.generateDefaultPassword(
+        userToUpadate.last_name,
+        userToUpadate.date_of_birth,
+      );
+
+      const salt = await bcryptjs.genSalt();
+      const hashedPassword = await bcryptjs.hash(password, salt);
+
+      const updatedUser: IUser = {
+        ...userToUpadate,
+        hashed_password: hashedPassword,
+        updated_at: new Date(),
+      };
+
+      const result = await usersRepo.update(updatedUser);
+
+      if (result !== true) {
+        return res.status(400).json({ error: 'The user could not be updated' });
+      }
+
+      res.status(200).json({ result: true });
+    } catch (error) {
+      logservice.error('[resetToDefaultPassword]', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  async resendWelcomeEmail(req: Request, res: Response) {
+    try {
+      const user = await usersRepo.retrieveById(req.user.uid);
+
+      if (!user.is_admin) {
+        return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
+      }
+
+      const { uid } = req.params as { uid: string };
+      const trimmedUid = uid.trim();
+      const userToSendEmail = await usersRepo.retrieveById(trimmedUid);
+
+      if (!userToSendEmail) {
+        return res.status(400).json({ error: `The user does not exist` });
+      }
+
+      const password = passwordManager.generateDefaultPassword(
+        userToSendEmail.last_name,
+        userToSendEmail.date_of_birth,
+      );
+
+      const isDefaultPassword = await bcryptjs.compare(password, userToSendEmail.hashed_password);
+
+      if (!isDefaultPassword) {
+        return res.status(400).json({ error: 'The user has already changed the password' });
+      }
+
+      await emailService.sendWelcomeEmail(userToSendEmail.email, {
+        civility: userToSendEmail.civility,
+        lastName: userToSendEmail.last_name,
+        defaultPass: password,
+      });
+
+      res.status(200).json({ sent: true, message: 'The email was successfully sent' });
+    } catch (error) {
+      logservice.error('[resendWelcomeEmail]', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  async archiveUser(req: Request, res: Response) {
+    try {
+      const user = await usersRepo.retrieveById(req.user.uid);
+
+      if (!user.is_admin) {
+        return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
+      }
+
+      const { uid } = req.params as { uid: string };
+      const trimmedUid = uid.trim();
+      const userToArchive = await usersRepo.retrieveById(trimmedUid);
+
+      if (!userToArchive) {
+        return res.status(400).json({ error: `The user does not exist` });
+      }
+
+      if (userToArchive.is_archived) {
+        return res.status(400).json({ error: `The user is already archived` });
+      }
+
+      const result = await usersRepo.archive(trimmedUid);
+
+      if (result !== true) {
+        return res.status(400).json({ error: 'The user could not be archived' });
+      }
+
+      res.status(200).json({ result: true, message: 'The user was successfully archived' });
+    } catch (error) {
+      logservice.error('[archiveUser]', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   }

@@ -1,0 +1,30 @@
+<html>
+  <head>
+    <style>
+      body { font-family: Arial, sans-serif; color: #333; background-color: #f4f4f4; }
+      .email-container { max-width: 600px; margin: 20px auto; background: white; border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); } .header { background-color: #0073e6; color:
+      white; padding: 20px; text-align: center; font-size: 24px; } .content { padding: 20px; color:
+      #555; line-height: 1.6; } .info-box { background-color: #f4f4f4; padding: 10px; border-radius:
+      5px; margin-top: 15px; } .footer { background-color: #f4f4f4; color: #666; padding: 10px;
+      text-align: center; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <div class='email-container'>
+      <div class='header'>Nouvelle connexion détectée</div>
+      <div class='content'>
+        <p>Bonjour {{civility}} {{lastName}},</p>
+        <p>Nous avons détecté une nouvelle connexion à votre compte. Voici les détails :</p>
+        <div class='info-box'>
+          <p><strong>Date de connexion :</strong> {{loginDate}}</p>
+          <p><strong>Système d'exploitation :</strong> {{operatingSystem}}</p>
+          <p><strong>Navigateur :</strong> {{browser}}</p>
+        </div>
+        <p>Si vous ne reconnaissez pas cette activité, veuillez contacter immédiatement notre
+          support interne.</p>
+      </div>
+      <div class='footer'>© 2024 Gérico. Tous droits réservés.</div>
+    </div>
+  </body>
+</html>

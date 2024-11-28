@@ -6,9 +6,9 @@ import companyInfoRoutes from './companyInfo';
 
 class Routes {
   constructor(app: Application) {
-    app.use('/api/users', usersRoutes);
-    app.use('/api/issues', issueReporterRoutes);
-    app.use('/api/company', companyInfoRoutes);
+    app.use('/api/v1/users', usersRoutes);
+    app.use('/api/v1/issues', issueReporterRoutes);
+    app.use('/api/v1/company', companyInfoRoutes);
   }
 }
 

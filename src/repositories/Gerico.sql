@@ -18,7 +18,7 @@ CREATE TABLE users (
     phone_number VARCHAR(20),
     email VARCHAR(100) UNIQUE NOT NULL,
     hashed_password VARCHAR(255) NOT NULL,
-    job VARCHAR(100),
+    job_title VARCHAR(100),
     job_department VARCHAR(100),
     remaining_leave_balance DECIMAL(3, 1),
     is_admin BOOLEAN DEFAULT FALSE,

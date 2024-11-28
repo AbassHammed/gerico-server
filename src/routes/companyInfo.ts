@@ -14,18 +14,18 @@ class CompanyInfoRouter {
 
   initRouter() {
     this.router.post(
-      '/create',
+      '/',
       requireAuth,
       validateResource(createCompanyInfoSchema),
       this.controller.create,
     );
     this.router.patch(
-      '/update',
+      '/',
       requireAuth,
       validateResource(createCompanyInfoSchema),
       this.controller.update,
     );
-    this.router.delete('/:siret/delete', requireAuth, this.controller.delete);
+    this.router.delete('/:siret', requireAuth, this.controller.delete);
     this.router.get('/:siret', requireAuth, this.controller.getById);
   }
 }

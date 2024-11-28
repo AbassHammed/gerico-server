@@ -4,7 +4,7 @@ import {
   UpdateIssueSchemaParams,
 } from '../middlewares/issueReporter.middleware';
 import { IIssueReporter } from '../models/interface';
-import { generateUUIDv4 } from '../utils/misc';
+import { generateId } from '../utils/misc';
 import issueReporter from '../repositories/issueReporter';
 import { logservice } from '../services/loggerService';
 
@@ -13,7 +13,7 @@ export class IssueReporterController {
     try {
       const newIssue: IIssueReporter = {
         ...req.body,
-        issue_id: generateUUIDv4(),
+        issue_id: generateId(),
         issue_date: new Date(),
         solved: false,
       };

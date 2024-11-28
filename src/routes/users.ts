@@ -21,7 +21,7 @@ class UsersRoutes {
 
   initRoutes() {
     this.router.post(
-      '/create',
+      '/',
       requireAuth,
       validateResource(createEmployeeSchema),
       this.controller.create,
@@ -48,12 +48,14 @@ class UsersRoutes {
       validateResource(resendResetCodeSchema),
       this.controller.resendPasswordCode,
     );
+    this.router.post('/resend-welcome-email/:uid', requireAuth, this.controller.resendWelcomeEmail);
     this.router.patch(
-      '/:uid/update',
+      '/:uid',
       requireAuth,
       validateResource(createEmployeeSchema),
       this.controller.update,
     );
+    this.router.patch('/archive/:uid', requireAuth, this.controller.archiveUser);
     this.router.get('/me', requireAuth, this.controller.getUser);
     this.router.get('/:uid', requireAuth, this.controller.retrieve);
     this.router.get('/', requireAuth, this.controller.retrieveAll);
