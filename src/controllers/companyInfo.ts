@@ -19,12 +19,12 @@ export class CompanyInfoController {
       const isAdmin = await checkAdmin(req.user.uid);
 
       if (!isAdmin) {
-        return res.status(401).json({ error: 'You are not supposed to be here' });
+        return res.status(401).json({ error: "Vous n'êtes pas censé être ici" });
       }
 
       const data = req.body;
       await CompanyRepository.save(data);
-      res.status(201).json({ message: 'Company created successfully' });
+      res.status(201).json({ message: 'Votre entreprise a été ajoutée avec succès' });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -35,13 +35,13 @@ export class CompanyInfoController {
       const isAdmin = await checkAdmin(req.user.uid);
 
       if (!isAdmin) {
-        return res.status(401).json({ error: 'You are not supposed to be here' });
+        return res.status(401).json({ error: "Vous n'êtes pas censé être ici" });
       }
 
       const { siret } = req.params;
       const company = await CompanyRepository.retrieveById(siret);
       if (!company) {
-        return res.status(404).json({ message: 'Company not found' });
+        return res.status(404).json({ message: "Votre entreprise n'a pas été trouvée" });
       }
       res.status(200).json(company);
     } catch (error) {
@@ -54,12 +54,12 @@ export class CompanyInfoController {
       const isAdmin = await checkAdmin(req.user.uid);
 
       if (!isAdmin) {
-        return res.status(401).json({ error: 'You are not supposed to be here' });
+        return res.status(401).json({ error: "Vous n'êtes pas censé être ici" });
       }
 
       const data = req.body;
       await CompanyRepository.update(data);
-      res.status(200).json({ message: 'Company updated successfully' });
+      res.status(200).json({ message: 'Votre entreprise a été mise à jour avec succès' });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -69,13 +69,13 @@ export class CompanyInfoController {
     const isAdmin = await checkAdmin(req.user.uid);
 
     if (!isAdmin) {
-      return res.status(401).json({ error: 'You are not supposed to be here' });
+      return res.status(401).json({ error: "Vous n'êtes pas censé être ici" });
     }
 
     try {
       const { siret } = req.params;
       await CompanyRepository.delete(siret);
-      res.status(200).json({ message: 'Company deleted successfully' });
+      res.status(200).json({ message: 'Votre entreprise a été supprimée de notre base' });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
