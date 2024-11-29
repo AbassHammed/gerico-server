@@ -19,7 +19,11 @@ export class CompanyInfoController {
       const isAdmin = await checkAdmin(req.user.uid);
 
       if (!isAdmin) {
-        return res.status(401).json({ error: "Vous n'êtes pas censé être ici" });
+        return res
+          .status(401)
+          .json({
+            error: `Vous avez essayé d'acccéder à une page qui nécéssite des droits adminstrateurs`,
+          });
       }
 
       const data = req.body;
@@ -35,13 +39,19 @@ export class CompanyInfoController {
       const isAdmin = await checkAdmin(req.user.uid);
 
       if (!isAdmin) {
-        return res.status(401).json({ error: "Vous n'êtes pas censé être ici" });
+        return res
+          .status(401)
+          .json({
+            error: `Vous avez essayé d'acccéder à une page qui nécéssite des droits adminstrateurs`,
+          });
       }
 
       const { siret } = req.params;
       const company = await CompanyRepository.retrieveById(siret);
       if (!company) {
-        return res.status(404).json({ message: "Votre entreprise n'a pas été trouvée" });
+        return res
+          .status(404)
+          .json({ message: `Nous n'avons pas pu trouver l'entreprise que vous recherchez` });
       }
       res.status(200).json(company);
     } catch (error) {
@@ -54,12 +64,16 @@ export class CompanyInfoController {
       const isAdmin = await checkAdmin(req.user.uid);
 
       if (!isAdmin) {
-        return res.status(401).json({ error: "Vous n'êtes pas censé être ici" });
+        return res
+          .status(401)
+          .json({
+            error: `Vous avez essayé d'acccéder à une page qui nécéssite des droits adminstrateurs`,
+          });
       }
 
       const data = req.body;
       await CompanyRepository.update(data);
-      res.status(200).json({ message: 'Votre entreprise a été mise à jour avec succès' });
+      res.status(200).json({ message: `L'entreprise a été mise à jour avec succès` });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -69,13 +83,19 @@ export class CompanyInfoController {
     const isAdmin = await checkAdmin(req.user.uid);
 
     if (!isAdmin) {
-      return res.status(401).json({ error: "Vous n'êtes pas censé être ici" });
+      return res
+        .status(401)
+        .json({
+          error: `Vous avez essayé d'acccéder à une page qui nécéssite des droits adminstrateurs`,
+        });
     }
 
     try {
       const { siret } = req.params;
       await CompanyRepository.delete(siret);
-      res.status(200).json({ message: 'Votre entreprise a été supprimée de notre base' });
+      res
+        .status(200)
+        .json({ message: `L'entreprise a été supprimée de notre base de données avec succès` });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
