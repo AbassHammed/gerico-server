@@ -24,19 +24,19 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
     }
 
     if (!token) {
-      return res.status(401).json({ error: 'Unauthorized - No token provided' });
+      return res.status(401).json({ error: 'Non autorisé - Aucun token fourni' });
     }
 
     const decoded = jwtServices.decode(token);
 
     if (!decoded) {
-      return res.status(401).json({ error: 'Unautorized - Invalid token' });
+      return res.status(401).json({ error: 'Non autorisé - token invalide' });
     }
 
     const user = await userRepo.retrieveById(decoded.uid);
 
     if (!user) {
-      return res.status(401).json({ error: 'User not found' });
+      return res.status(401).json({ error: 'Utilisateur introuvable' });
     }
 
     req.user = user;
