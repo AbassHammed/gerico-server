@@ -19,11 +19,9 @@ export class CompanyInfoController {
       const isAdmin = await checkAdmin(req.user.uid);
 
       if (!isAdmin) {
-        return res
-          .status(401)
-          .json({
-            error: `Vous avez essayé d'acccéder à une page qui nécéssite des droits adminstrateurs`,
-          });
+        return res.status(401).json({
+          error: `Vous avez essayé d'acccéder à une page qui nécéssite des droits adminstrateurs`,
+        });
       }
 
       const data = req.body;
@@ -39,11 +37,9 @@ export class CompanyInfoController {
       const isAdmin = await checkAdmin(req.user.uid);
 
       if (!isAdmin) {
-        return res
-          .status(401)
-          .json({
-            error: `Vous avez essayé d'acccéder à une page qui nécéssite des droits adminstrateurs`,
-          });
+        return res.status(401).json({
+          error: `Vous avez essayé d'acccéder à une page qui nécéssite des droits adminstrateurs`,
+        });
       }
 
       const { siret } = req.params;
@@ -64,16 +60,16 @@ export class CompanyInfoController {
       const isAdmin = await checkAdmin(req.user.uid);
 
       if (!isAdmin) {
-        return res
-          .status(401)
-          .json({
-            error: `Vous avez essayé d'acccéder à une page qui nécéssite des droits adminstrateurs`,
-          });
+        return res.status(401).json({
+          error: `Vous avez essayé d'acccéder à une page qui nécéssite des droits adminstrateurs`,
+        });
       }
 
       const data = req.body;
       await CompanyRepository.update(data);
-      res.status(200).json({ message: `L'entreprise a été mise à jour avec succès` });
+      res
+        .status(200)
+        .json({ message: `Les informations de l'entreprise ont été mise à jour avec succès` });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -83,11 +79,9 @@ export class CompanyInfoController {
     const isAdmin = await checkAdmin(req.user.uid);
 
     if (!isAdmin) {
-      return res
-        .status(401)
-        .json({
-          error: `Vous avez essayé d'acccéder à une page qui nécéssite des droits adminstrateurs`,
-        });
+      return res.status(401).json({
+        error: `Vous avez essayé d'acccéder à une page qui nécéssite des droits adminstrateurs`,
+      });
     }
 
     try {
@@ -95,7 +89,9 @@ export class CompanyInfoController {
       await CompanyRepository.delete(siret);
       res
         .status(200)
-        .json({ message: `L'entreprise a été supprimée de notre base de données avec succès` });
+        .json({
+          message: `Les informations de l'entreprise ont été supprimée de notre base de données avec succès`,
+        });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
