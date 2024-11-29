@@ -2,69 +2,75 @@ import { object, string, TypeOf, number, boolean } from 'zod';
 
 export const createEmployeeSchema = object({
   body: object({
-    civility: string({ required_error: 'Civility is required' }),
-    first_name: string({ required_error: 'First name is required' })
-      .min(1, 'First name must be at least 1 character long')
-      .max(16, 'First name must be at most 16 characters long'),
-    last_name: string({ required_error: 'Last name is required' }).min(
+    civility: string({ required_error: 'La civilité est requise' }),
+    first_name: string({ required_error: 'Le prénom est requis' })
+      .min(1, 'Veuillez saisir un prénom comportant au moins un caractère.')
+      .max(16, 'Veuillez saisir un prénom de 16 caractères maximum.'),
+    last_name: string({ required_error: 'Le nom de famille est requis' }).min(
       1,
-      'Last name must be at least 1 character long',
+      'Veuillez saisir un nom de famille comportant au moins un caractère.',
     ),
-    email: string({ required_error: 'Email is required' }).email('Not a valid email'),
-    phone_number: string({ required_error: 'Phone number is required' }),
+    email: string({ required_error: `L'adresse e-mail est requise` }).email(
+      `Veuillez entrer une adresse e-mail valide`,
+    ),
+    phone_number: string({ required_error: 'Le numéro de téléphone est requis' }),
     is_admin: boolean(),
-    hire_date: string({ required_error: 'Hire date is required' }),
-    job_title: string({ required_error: 'Job title is required' }),
-    job_department: string({ required_error: 'The user departement is required.' }),
-    address_line1: string({ required_error: 'Address line 1 is required' }),
+    hire_date: string({ required_error: `La date d'embauche est requise` }),
+    job_title: string({ required_error: `L'intitulé du poste est requis` }),
+    job_department: string({ required_error: `Le département de l'utilisateur est requis` }),
+    address_line1: string({ required_error: `Le champ 'Adresse ligne 1' est requis` }),
     address_line2: string().optional(),
-    city: string({ required_error: 'City is required' }),
-    postal_code: string({ required_error: 'Postal code is required' }),
-    country: string({ required_error: 'Country is required' }),
-    date_of_birth: string({ required_error: 'Date of birth is required' }),
-    social_security_number: string({ required_error: 'Social security number is required' }),
-    remaining_leave_balance: number({ required_error: 'Work hours per month is required' }),
-    contract_type: string({ required_error: 'Contract type is required' }),
-    marital_status: string({ required_error: 'Marital status is required' }),
-    dependants: number({ required_error: 'Number of dependents is required' }),
-    company_id: string({ required_error: 'company id is required' }).min(14).max(14),
+    city: string({ required_error: 'La ville est requise' }),
+    postal_code: string({ required_error: 'Le Code Postal est requis' }),
+    country: string({ required_error: 'Le pays est requis' }),
+    date_of_birth: string({ required_error: 'La date de naissance est requise' }),
+    social_security_number: string({ required_error: 'Le numéro de Sécurité Social est requis' }),
+    remaining_leave_balance: number({
+      required_error: `Le nombre d'heures de travail par mois est requis`,
+    }),
+    contract_type: string({ required_error: 'Le type de contrat est requis' }),
+    marital_status: string({ required_error: `L'état civil est requis` }),
+    dependants: number({ required_error: 'Le nombre de personnes à charge est requis' }),
+    company_id: string({ required_error: `L'identifiant de l'entreprise (siret) est requis` })
+      .min(14)
+      .max(14),
   }),
 });
 
 export const forgotPasswordSchema = object({
   body: object({
     email: string({
-      required_error: 'Email is required',
-    }).email('Not a valid email'),
+      required_error: `L'adresse e-mail est requise`,
+    }).email(`Veuillez entrer une adresse e-mail valide`),
   }),
 });
 
 export const loginSchema = object({
   body: object({
-    browser: string({ required_error: 'Browser is required' }),
-    os: string({ required_error: 'OS is required' }),
+    browser: string({ required_error: 'Un navigateur est requis' }),
+    os: string({ required_error: `Le système d'exploitation est requis` }),
     email: string({
-      required_error: 'Email is required',
-    }).email('Not a valid email'),
+      required_error: `L'adresse e-mail est requise`,
+    }).email(`Veuillez entrer une adresse e-mail valide`),
     password: string({
-      required_error: 'Password is required',
+      required_error: 'Le mot de passe est requis',
     })
-      .min(8, 'Password must be at least 8 characters long')
-      .max(16, 'Password must be at most 16 characters long'),
+      .min(8, 'Veuillez saisir un mot de passe comportant au moins 8 caractère.')
+      .max(16, 'Veuillez saisir un mot de passe de 16 caractères maximum.'),
   }),
 });
 
 export const resetPasswordSchema = object({
   body: object({
-    uid: string({ required_error: 'UID is required' }),
-    reset_code: string({ required_error: 'Reset code is required' }),
-    password: string({ required_error: 'Password is required' }).min(
+    uid: string({ required_error: `L'identifiant de utilisateur est requis` }),
+    reset_code: string({ required_error: 'Le code de réinitialisation est requis' }),
+    password: string({ required_error: 'Le mot de passe est requis' }).min(
       8,
       'Password must be at least 8 characters long',
     ),
-    confirm_password: string({ required_error: 'Confirm password is required' }),
+    confirm_password: string({ required_error: 'La confirmation du mot de passe est requise' }),
   }).refine(data => data.password === data.confirm_password, {
-    message: 'Passwords do not match',
+    message: 'Les mots de passe ne correspondent pas',
     path: ['confirm_password'],
   }),
 });
@@ -72,19 +78,19 @@ export const resetPasswordSchema = object({
 // for simplification we are expect the minimum critere for a password to be handle on the front, since we are also using zod there
 export const changeDefaultPasswordSchema = object({
   body: object({
-    password: string({ required_error: 'Password is required' })
-      .min(8, 'Password must be at least 8 characters long')
-      .max(16, 'Password must be at most 16 characters long'),
-    confirmPassword: string({ required_error: 'Confirm password is required' }),
+    password: string({ required_error: 'Le mot de passe est requis' })
+      .min(8, 'Veuillez saisir un mot de passe comportant au moins 8 caractère.')
+      .max(16, 'Veuillez saisir un mot de passe de 16 caractères maximum.'),
+    confirmPassword: string({ required_error: 'La confirmation du mot de passe est requise' }),
   }).refine(data => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
+    message: 'Les mots de passe ne correspondent pas',
     path: ['confirmPassword'],
   }),
 });
 
 export const resendResetCodeSchema = object({
   body: object({
-    uid: string({ required_error: 'UID is required' }),
+    uid: string({ required_error: `L'identifiant de utilisateur est requis` }),
   }),
 });
 

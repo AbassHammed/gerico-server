@@ -47,13 +47,15 @@ export class UsersController {
       const admin = await usersRepo.retrieveById(req.user.uid);
 
       if (!admin?.is_admin) {
-        return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
+        return res
+          .status(401)
+          .json({ error: `Accès refusé : utilisateur non autorisé`, code: 'UNAUTHORIZED' });
       }
 
       const withEmail = await usersRepo.retrieveByEmail(email);
 
       if (withEmail) {
-        return res.status(400).json({ error: 'The email is already used' });
+        return res.status(400).json({ error: `L'adresse e-mail est déjà utilisée.` });
       }
 
       const dateOfBirth = new Date(date_of_birth);
@@ -85,7 +87,9 @@ export class UsersController {
       if (result !== true) {
         return res
           .status(401)
-          .json({ error: 'An error occured while creating the user, please try again' });
+          .json({
+            error: `Une erreur s'est produite lors de la création de l'utilisateur. Veuillez réessayer.`,
+          });
       }
 
       // we may need to implement a services that retries sending the email for sometimes incase of error
@@ -96,10 +100,10 @@ export class UsersController {
         defaultPass: password,
       });
 
-      res.status(201).json({ message: 'The employee was successfully created.' });
+      res.status(201).json({ message: `L'employé a été créé avec succès.` });
     } catch (error) {
       logservice.info('[create]', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: `Erreur interne du serveur.` });
     }
   }
 
@@ -112,13 +116,16 @@ export class UsersController {
       if (!user) {
         return res
           .status(400)
-          .json({ error: 'No user with the email provided.', code: 'ENOTFOUND' });
+          .json({
+            error: `Aucun utilisateur trouvé avec l'adresse e-mail fournie.`,
+            code: 'ENOTFOUND',
+          });
       }
 
       const isPasswordCorrect = await bcryptjs.compare(password, user.hashed_password);
 
       if (!isPasswordCorrect) {
-        return res.status(400).json({ error: 'Incorrect password', code: 'EINCPASS' });
+        return res.status(400).json({ error: `Mot de passe incorrect.`, code: 'EINCPASS' });
       }
 
       const isdefaultPassword = passwordManager.isDefaultPattern(password);
@@ -140,7 +147,7 @@ export class UsersController {
       res.status(200).json({ token, user });
     } catch (error) {
       logservice.error('[login]', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: `Erreur interne du serveur.` });
     }
   }
 
@@ -151,7 +158,9 @@ export class UsersController {
       const user = await usersRepo.retrieveByEmail(email);
 
       if (!user) {
-        return res.status(400).json({ error: 'Employee with this email does not exist' });
+        return res
+          .status(400)
+          .json({ error: `Aucun employé ne correspond à cette adresse e-mail.` });
       }
 
       const resetCode = generateRandomCode();
@@ -191,7 +200,9 @@ export class UsersController {
       const user = await usersRepo.retrieveById(req.user.uid);
 
       if (!user) {
-        return res.status(400).json({ error: 'Employee with this email does not exist' });
+        return res
+          .status(400)
+          .json({ error: `Un employé avec cette adresse e-mail n'existe pas.` });
       }
 
       const salt = await bcryptjs.genSalt();
@@ -207,7 +218,9 @@ export class UsersController {
 
       if (upadate !== true) {
         // This will never occur, cause the update method will either return true or throw an error, but you know error handling in case of incasity
-        return res.status(400).json({ error: 'The user could not be updated' });
+        return res
+          .status(400)
+          .json({ error: `Le profil de l'utilisateur n'a pas pu être mis à jour.` });
       }
 
       const token = jwtServices.encode({ uid: updatedUser.uid });
@@ -215,7 +228,7 @@ export class UsersController {
       res.status(200).json({ token, user: updatedUser });
     } catch (error) {
       logservice.error('[changeDefaultPassword]', error);
-      res.status(500).json({ error: 'An internal error occured' });
+      res.status(500).json({ error: `Une erreur interne est survenue.` });
     }
   }
 
@@ -226,11 +239,11 @@ export class UsersController {
       const user = await usersRepo.retrieveById(uid);
 
       if (!user) {
-        return res.status(401).json({ error: 'The user does not exist' });
+        return res.status(401).json({ error: `L'utilisateur n'existe pas.` });
       }
 
       if (user.reset_code !== reset_code) {
-        return res.status(401).json({ error: 'The code in incorrect' });
+        return res.status(401).json({ error: `Le code est incorrect.` });
       }
 
       const salt = await bcryptjs.genSalt();
@@ -246,13 +259,13 @@ export class UsersController {
 
       if (result !== true) {
         // as explained above, !!! never going to happen
-        res.status(400).json({ error: 'The employee password could not be changed' });
+        res.status(400).json({ error: `Le mot de passe de l'employé n'a pas pu être modifié.` });
       }
 
       res.status(201).json({ result: true });
     } catch (error) {
       logservice.error('[resetPassword]', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: `Erreur interne du serveur.` });
     }
   }
 
@@ -266,12 +279,12 @@ export class UsersController {
       const user = await usersRepo.retrieveById(uid);
 
       if (!user) {
-        return res.status(400).json({ error: 'This user does not exist' });
+        return res.status(400).json({ error: `L'utilisateur n'existe pas.` });
       }
 
       if (!user.reset_code) {
         return res.status(400).json({
-          error: 'You have not make any password change request for us to send you a code.',
+          error: `Vous n'avez pas effectué de demande de changement de mot de passe pour que nous vous envoyions un code.`,
         });
       }
 
@@ -284,7 +297,9 @@ export class UsersController {
       res.status(200).json({ sent: true });
     } catch (error) {
       logservice.error('[resendPasswordCode]', error);
-      res.status(500).json({ error: 'An unknown error occured while resending the email.' });
+      res
+        .status(500)
+        .json({ error: `Une erreur inconnue est survenue lors de la réexpédition de l'e-mail.` });
     }
   }
 
@@ -293,7 +308,9 @@ export class UsersController {
       const admin = await usersRepo.retrieveById(req.user.uid);
 
       if (!admin?.is_admin) {
-        return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
+        return res
+          .status(401)
+          .json({ error: `Accès refusé : utilisateur non autorisé`, code: 'UNAUTHORIZED' });
       }
 
       const { uid } = req.params as { uid: string };
@@ -302,7 +319,7 @@ export class UsersController {
       const user = await usersRepo.retrieveById(trimmedUid);
 
       if (!user) {
-        return res.status(400).json({ error: 'The user does not exist' });
+        return res.status(400).json({ error: `L'utilisateur n'existe pas.` });
       }
 
       const hire_date = new Date(req.body.hire_date);
@@ -319,13 +336,15 @@ export class UsersController {
       const result = await usersRepo.update(updatedUser);
 
       if (result !== true) {
-        return res.status(400).json({ error: 'The user could not be updated' });
+        return res
+          .status(400)
+          .json({ error: `Le profil de l'utilisateur n'a pas pu être mis à jour.` });
       }
 
       res.status(200).json({ result: true });
     } catch (error) {
       logservice.error('[update]', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: `Erreur interne du serveur.` });
     }
   }
 
@@ -337,13 +356,13 @@ export class UsersController {
       const user = await usersRepo.retrieveById(trimmedUid);
 
       if (!user) {
-        return res.status(400).json({ error: 'The user does not exist' });
+        return res.status(400).json({ error: `L'utilisateur n'existe pas.` });
       }
 
       res.status(200).json({ user });
     } catch (error) {
       logservice.error('[retrieve]', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: `Erreur interne du serveur.` });
     }
   }
 
@@ -352,7 +371,9 @@ export class UsersController {
       const admin = await usersRepo.retrieveById(req.user.uid);
 
       if (!admin?.is_admin) {
-        return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
+        return res
+          .status(401)
+          .json({ error: 'Accès refusé : utilisateur non autorisé', code: 'UNAUTHORIZED' });
       }
 
       const users = await usersRepo.retrieveAll();
@@ -360,7 +381,7 @@ export class UsersController {
       res.status(200).json({ users });
     } catch (error) {
       logservice.error('[retrieveAll]', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: `Erreur interne du serveur.` });
     }
   }
 
@@ -369,13 +390,13 @@ export class UsersController {
       const user = await usersRepo.retrieveById(req.user.uid);
 
       if (!user) {
-        return res.status(400).json({ error: `The user does not exist` });
+        return res.status(400).json({ error: `L'utilisateur n'existe pas.` });
       }
 
       res.status(200).json({ user });
     } catch (error) {
       logservice.error('[getUser]', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: `Erreur interne du serveur.` });
     }
   }
 
@@ -384,7 +405,9 @@ export class UsersController {
       const user = await usersRepo.retrieveById(req.user.uid);
 
       if (!user.is_admin) {
-        return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
+        return res
+          .status(401)
+          .json({ error: 'Accès refusé : utilisateur non autorisé', code: 'UNAUTHORIZED' });
       }
 
       const { uid } = req.params as { uid: string };
@@ -392,7 +415,7 @@ export class UsersController {
       const userToUpadate = await usersRepo.retrieveById(trimmedUid);
 
       if (!userToUpadate) {
-        return res.status(400).json({ error: `The user does not exist` });
+        return res.status(400).json({ error: `L'utilisateur n'existe pas.` });
       }
 
       const password = passwordManager.generateDefaultPassword(
@@ -412,13 +435,15 @@ export class UsersController {
       const result = await usersRepo.update(updatedUser);
 
       if (result !== true) {
-        return res.status(400).json({ error: 'The user could not be updated' });
+        return res
+          .status(400)
+          .json({ error: `Le profil de l'utilisateur n'a pas pu être mis à jour.` });
       }
 
       res.status(200).json({ result: true });
     } catch (error) {
       logservice.error('[resetToDefaultPassword]', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: `Erreur interne du serveur.` });
     }
   }
 
@@ -427,7 +452,9 @@ export class UsersController {
       const user = await usersRepo.retrieveById(req.user.uid);
 
       if (!user.is_admin) {
-        return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
+        return res
+          .status(401)
+          .json({ error: 'Accès refusé : utilisateur non autorisé', code: 'UNAUTHORIZED' });
       }
 
       const { uid } = req.params as { uid: string };
@@ -435,7 +462,7 @@ export class UsersController {
       const userToSendEmail = await usersRepo.retrieveById(trimmedUid);
 
       if (!userToSendEmail) {
-        return res.status(400).json({ error: `The user does not exist` });
+        return res.status(400).json({ error: `L'utilisateur n'existe pas.` });
       }
 
       const password = passwordManager.generateDefaultPassword(
@@ -446,7 +473,7 @@ export class UsersController {
       const isDefaultPassword = await bcryptjs.compare(password, userToSendEmail.hashed_password);
 
       if (!isDefaultPassword) {
-        return res.status(400).json({ error: 'The user has already changed the password' });
+        return res.status(400).json({ error: `L'utilisateur a déjà changé son mot de passe.` });
       }
 
       await emailService.sendWelcomeEmail(userToSendEmail.email, {
@@ -455,10 +482,10 @@ export class UsersController {
         defaultPass: password,
       });
 
-      res.status(200).json({ sent: true, message: 'The email was successfully sent' });
+      res.status(200).json({ sent: true, message: `L'e-mail a été envoyé avec succès.` });
     } catch (error) {
       logservice.error('[resendWelcomeEmail]', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: `Erreur interne du serveur.` });
     }
   }
 
@@ -467,7 +494,9 @@ export class UsersController {
       const user = await usersRepo.retrieveById(req.user.uid);
 
       if (!user.is_admin) {
-        return res.status(401).json({ error: 'Unauthorized user.', code: 'UNAUTHORIZED' });
+        return res
+          .status(401)
+          .json({ error: 'Accès refusé : utilisateur non autorisé', code: 'UNAUTHORIZED' });
       }
 
       const { uid } = req.params as { uid: string };
@@ -475,23 +504,23 @@ export class UsersController {
       const userToArchive = await usersRepo.retrieveById(trimmedUid);
 
       if (!userToArchive) {
-        return res.status(400).json({ error: `The user does not exist` });
+        return res.status(400).json({ error: `L'utilisateur n'existe pas.` });
       }
 
       if (userToArchive.is_archived) {
-        return res.status(400).json({ error: `The user is already archived` });
+        return res.status(400).json({ error: `L'utilisateur est déjà archivé.` });
       }
 
       const result = await usersRepo.archive(trimmedUid);
 
       if (result !== true) {
-        return res.status(400).json({ error: 'The user could not be archived' });
+        return res.status(400).json({ error: `L'utilisateur n'a pas pu être archivé.` });
       }
 
-      res.status(200).json({ result: true, message: 'The user was successfully archived' });
+      res.status(200).json({ result: true, message: `L'utilisateur a été archivé avec succès.` });
     } catch (error) {
       logservice.error('[archiveUser]', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: `Erreur interne du serveur.` });
     }
   }
 }
