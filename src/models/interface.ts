@@ -68,8 +68,8 @@ export interface IEmployee {
 
 export interface IIssueReporter {
   issue_id: string;
-  type: 'auth' | 'leave' | 'payslip' | 'other';
-  priority: 'high' | 'average' | 'normal';
+  type: string;
+  priority: string;
   subject: string;
   description: string;
   solved: boolean;
