@@ -4,17 +4,17 @@ export const createIssueSchema = object({
   body: object({
     type: literal('auth').or(literal('payslip')).or(literal('leave')).or(literal('other')),
     priority: literal('high').or(literal('average')).or(literal('normal')),
-    subject: string().min(1, 'Subject is required'),
-    description: string().min(1, 'Description is required'),
+    subject: string().min(1, 'Le sujet est requis'),
+    description: string().min(1, 'La description est requise'),
   }).refine(data => data.type && data.priority && data.subject && data.description, {
-    message: 'All fields are required',
+    message: 'Tous les champs sont requis',
     path: ['body'],
   }),
 });
 
 export const updateIssueSchema = object({
   params: object({
-    id: string().min(1, { message: 'ID is required' }),
+    id: string().min(1, { message: `L'identifiant est requis` }),
   }),
 });
 
