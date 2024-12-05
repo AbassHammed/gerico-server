@@ -3,7 +3,7 @@ import CompanyRepository from '../repositories/companyInfo';
 import userRepository from '../repositories/users';
 import { CompanyInfoBodyType } from '../middlewares/companyInfo.middleware';
 
-async function checkAdmin(adminId: string) {
+export async function checkAdmin(adminId: string) {
   const admin = await userRepository.retrieveById(adminId);
 
   if (!admin || !admin.is_admin) {
@@ -87,11 +87,9 @@ export class CompanyInfoController {
     try {
       const { siret } = req.params;
       await CompanyRepository.delete(siret);
-      res
-        .status(200)
-        .json({
-          message: `Les informations de l'entreprise ont été supprimée de notre base de données avec succès`,
-        });
+      res.status(200).json({
+        message: `Les informations de l'entreprise ont été supprimée de notre base de données avec succès`,
+      });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

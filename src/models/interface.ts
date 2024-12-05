@@ -98,6 +98,16 @@ export interface ILeaveRequest extends RowDataPacket {
   reason: string;
 }
 
+export interface ISSThresholds {
+  threshold_id: string;
+  threshold_name: string;
+  min_value: number;
+  max_value: number;
+  is_ceiling: boolean;
+}
+
+export interface ISSThresholdsRow extends ISSThresholds, RowDataPacket {}
+
 export interface ICompanyInfo {
   siret: string;
   code_ape: string;

@@ -85,11 +85,9 @@ export class UsersController {
       const result = await usersRepo.save(newEmployee);
 
       if (result !== true) {
-        return res
-          .status(401)
-          .json({
-            error: `Une erreur s'est produite lors de la création de l'utilisateur. Veuillez réessayer.`,
-          });
+        return res.status(401).json({
+          error: `Une erreur s'est produite lors de la création de l'utilisateur. Veuillez réessayer.`,
+        });
       }
 
       // we may need to implement a services that retries sending the email for sometimes incase of error
@@ -114,12 +112,10 @@ export class UsersController {
       const user = await usersRepo.retrieveByEmail(email);
 
       if (!user) {
-        return res
-          .status(400)
-          .json({
-            error: `Aucun utilisateur trouvé avec l'adresse e-mail fournie.`,
-            code: 'ENOTFOUND',
-          });
+        return res.status(400).json({
+          error: `Aucun utilisateur trouvé avec l'adresse e-mail fournie.`,
+          code: 'ENOTFOUND',
+        });
       }
 
       const isPasswordCorrect = await bcryptjs.compare(password, user.hashed_password);

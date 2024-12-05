@@ -72,3 +72,12 @@ CREATE TABLE issue_reports (
     solved BOOLEAN DEFAULT FALSE,
     issue_date DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE social_security_thresholds (
+	threshold_id VARCHAR(11) PRIMARY KEY,
+	threshold_name VARCHAR(50) NOT NULL,
+	min_value DECIMAL(10, 2) NOT NULL,
+	max_value DECIMAL(10, 2),
+	is_ceiling BOOLEAN DEFAULT FALSE
+);
+
