@@ -81,3 +81,12 @@ CREATE TABLE social_security_thresholds (
 	is_ceiling BOOLEAN DEFAULT FALSE
 );
 
+CREATE TABLE deductions (
+	deduction_id VARCHAR(16) PRIMARY KEY,
+	deduction_type VARCHAR(100) NOT NULL,
+	deduction_name VARCHAR(100) NOT NULL,
+	part_salarial DECIMAL(8, 6) NOT NULL,
+	part_patronal DECIMAL(8, 6) NOT NULL,
+	threshold_id VARCHAR(16),
+	FOREIGN KEY (threshold_id) REFERENCES social_security_thresholds(threshold_id) ON DELETE CASCADE
+);

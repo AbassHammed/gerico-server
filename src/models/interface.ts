@@ -98,7 +98,7 @@ export interface ILeaveRequest extends RowDataPacket {
   reason: string;
 }
 
-export interface ISSThresholds {
+export interface ISSThreshold {
   threshold_id: string;
   threshold_name: string;
   min_value: number;
@@ -106,7 +106,18 @@ export interface ISSThresholds {
   is_ceiling: boolean;
 }
 
-export interface ISSThresholdsRow extends ISSThresholds, RowDataPacket {}
+export interface IDeduction {
+  deduction_id: string;
+  deduction_type: string;
+  deduction_name: string;
+  part_salarial: number;
+  part_patronal: number;
+  threshold_id: string;
+}
+
+export interface IDeductionRow extends IDeduction, RowDataPacket {}
+
+export interface ISSThresholdRow extends ISSThreshold, RowDataPacket {}
 
 export interface ICompanyInfo {
   siret: string;
