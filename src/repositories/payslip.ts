@@ -29,6 +29,18 @@ class PayslipRepository implements IRepository<IPayslip> {
     });
   }
 
+  retrieveById(id: string | number): Promise<IPayslip> {
+    return new Promise((resolve, reject) => {
+      connection.query<IPayslipRow[]>('SELECT * FROM pay_slips WHERE pid = ?', [id], (err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res?.[0]);
+        }
+      });
+    });
+  }
+
   retrieveAll(): Promise<IPayslip[]> {
     return new Promise((resolve, reject) => {
       connection.query<IPayslipRow[]>('SELECT * FROM pay_slips', (err, res) => {

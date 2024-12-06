@@ -90,8 +90,6 @@ export class UsersController {
         });
       }
 
-      // we may need to implement a services that retries sending the email for sometimes incase of error
-      // or maybe we need a better implementation
       await emailService.sendWelcomeEmail(newEmployee.email, {
         civility: newEmployee.civility,
         lastName: newEmployee.last_name,

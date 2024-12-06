@@ -1,9 +1,9 @@
 /* eslint-disable quotes */
-import { object, string, number, TypeOf } from 'zod';
+import { object, string, number, z } from 'zod';
 
 export const createPayslipSchema = object({
   body: object({
-    uid: string(),
+    uid: string({ required_error: 'Le ' }),
     gross_salary: number({ required_error: 'Le salaire brut est requis' }),
     net_salary: number({ required_error: 'Le salaire net est requis' }),
     start_period: string({ required_error: 'La période de début est requise' }),
@@ -17,4 +17,6 @@ export const createPayslipSchema = object({
   }),
 });
 
-export type CreatePayslipInput = TypeOf<typeof createPayslipSchema>['body'];
+export type CreatePayslipInput = Required<
+  Omit<z.infer<typeof createPayslipSchema>['body'], 'path_to_pdf'>
+> & { path_to_pdf?: string };

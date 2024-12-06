@@ -36,14 +36,14 @@ export interface IUserRowData extends IUser, RowDataPacket {}
 export interface IPayslip {
   pid: string;
   uid: string;
-  gross_salary: string;
-  net_salary: string;
+  gross_salary: number;
+  net_salary: number;
   start_period: Date;
   end_period: Date;
   pay_date: Date;
   total_hours_worked: string;
   hourly_rate: number;
-  path_to_pdf: string;
+  path_to_pdf?: string;
 }
 
 export interface IPayslipRow extends IPayslip, RowDataPacket {}
