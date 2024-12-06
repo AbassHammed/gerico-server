@@ -3,7 +3,7 @@ import { object, string, number, z } from 'zod';
 
 export const createPayslipSchema = object({
   body: object({
-    uid: string({ required_error: 'Le ' }),
+    uid: string({ required_error: 'Le UID est requis' }),
     gross_salary: number({ required_error: 'Le salaire brut est requis' }),
     net_salary: number({ required_error: 'Le salaire net est requis' }),
     start_period: string({ required_error: 'La période de début est requise' }),
