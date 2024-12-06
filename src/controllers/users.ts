@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import {
   ChangeDefaultPasswordInput,
-  CreateEmployeeInput,
+  CreateUserInput,
   ForgotPasswordInput,
   LoginInput,
   ResendResetPasswordCodeInput,
   ResetPasswordInput,
-} from '../middlewares/employee.middleware';
+} from '../middlewares/users.middleware';
 import usersRepo from '../repositories/users';
 import bcryptjs from 'bcryptjs';
 import passwordManager from '../services/passwordManager';
@@ -40,7 +40,7 @@ function generateRandomCode(): string {
  */
 
 export class UsersController {
-  async create(req: Request<object, object, CreateEmployeeInput>, res: Response) {
+  async create(req: Request<object, object, CreateUserInput>, res: Response) {
     try {
       const { email, last_name, date_of_birth, hire_date } = req.body;
 
@@ -299,7 +299,7 @@ export class UsersController {
     }
   }
 
-  async update(req: Request<any, object, CreateEmployeeInput>, res: Response) {
+  async update(req: Request<any, object, CreateUserInput>, res: Response) {
     try {
       const admin = await usersRepo.retrieveById(req.user.uid);
 

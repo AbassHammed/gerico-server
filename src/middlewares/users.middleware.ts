@@ -1,6 +1,6 @@
 import { object, string, TypeOf, number, boolean } from 'zod';
 
-export const createEmployeeSchema = object({
+export const createUserSchema = object({
   body: object({
     civility: string({ required_error: 'La civilité est requise' }),
     first_name: string({ required_error: 'Le prénom est requis' })
@@ -94,7 +94,7 @@ export const resendResetCodeSchema = object({
   }),
 });
 
-export type CreateEmployeeInput = Required<TypeOf<typeof createEmployeeSchema>['body']>;
+export type CreateUserInput = Required<TypeOf<typeof createUserSchema>['body']>;
 
 export type ForgotPasswordInput = TypeOf<typeof forgotPasswordSchema>['body'];
 

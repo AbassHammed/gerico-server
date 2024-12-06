@@ -3,12 +3,12 @@ import { UsersController } from '../controllers/users';
 import validateResource from '../middlewares/route-verif';
 import {
   changeDefaultPasswordSchema,
-  createEmployeeSchema,
+  createUserSchema,
   forgotPasswordSchema,
   loginSchema,
   resendResetCodeSchema,
   resetPasswordSchema,
-} from '../middlewares/employee.middleware';
+} from '../middlewares/users.middleware';
 import { requireAuth } from '../middlewares/protected-route';
 
 class UsersRoutes {
@@ -20,12 +20,7 @@ class UsersRoutes {
   }
 
   initRoutes() {
-    this.router.post(
-      '/',
-      requireAuth,
-      validateResource(createEmployeeSchema),
-      this.controller.create,
-    );
+    this.router.post('/', requireAuth, validateResource(createUserSchema), this.controller.create);
     this.router.post('/login', validateResource(loginSchema), this.controller.login);
     this.router.post(
       '/forgot-password',
@@ -52,7 +47,7 @@ class UsersRoutes {
     this.router.patch(
       '/:uid',
       requireAuth,
-      validateResource(createEmployeeSchema),
+      validateResource(createUserSchema),
       this.controller.update,
     );
     this.router.patch('/archive/:uid', requireAuth, this.controller.archiveUser);

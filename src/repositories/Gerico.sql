@@ -78,8 +78,8 @@ CREATE TABLE pay_slips (
 	start_period DATE NOT NULL,
 	end_period DATE NOT NULL,
 	pay_date DATE NOT NULL,
-	total_hours_worked JSON DEFAULT NULL,
+	total_hours_worked TEXT NOT NULL,
 	hourly_rate DECIMAL(5, 2),
-	path_to_pdf TEXT,
+	path_to_pdf TEXT DEFAULT NULL,
 	FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE
 );
