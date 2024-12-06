@@ -19,7 +19,7 @@ export class CommonUtils {
 
       res.status(200).json({ thresholds });
     } catch (error) {
-      logservice.error('[retrieveThresholds]', error);
+      logservice.error('[retrieveThresholds$CommonUtils]', error);
       res.status(501).json({ error: 'Erreur interne du serveur.' });
     }
   }
@@ -38,7 +38,7 @@ export class CommonUtils {
 
       res.status(200).json({ deductions });
     } catch (error) {
-      logservice.error('[retrieveDeductions]', error);
+      logservice.error('[retrieveDeductions$CommonUtils]', error);
       res.status(501).json({ error: 'Erreur interne du serveur.' });
     }
   }

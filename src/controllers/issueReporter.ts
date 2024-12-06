@@ -21,7 +21,7 @@ export class IssueReporterController {
       const result = await issueReporter.save(newIssue);
       res.status(201).json({ result });
     } catch (error) {
-      logservice.error(error);
+      logservice.error('[reportIssue$IssueReporterController]', error);
       res.status(500).json({ error: error.message });
     }
   }
@@ -31,7 +31,7 @@ export class IssueReporterController {
       const result = await issueReporter.retrieveAll();
       res.status(200).json({ result });
     } catch (error) {
-      logservice.error(error);
+      logservice.error('[getIssues$IssueReporterController]', error);
       res.status(500).json({ error: error.message });
     }
   }
@@ -43,7 +43,7 @@ export class IssueReporterController {
       const result = await issueReporter.solved(id);
       res.status(200).json({ result });
     } catch (error) {
-      logservice.error(error);
+      logservice.error('[markIssueAsSolved$IssueReporterController]', error);
       res.status(500).json({ error: error.message });
     }
   }
@@ -53,7 +53,7 @@ export class IssueReporterController {
       const result = await issueReporter.retrieveNotSolved();
       res.status(200).json({ result });
     } catch (error) {
-      logservice.error(error);
+      logservice.error('[getIssuesNotSolved$IssueReporterController]', error);
       res.status(500).json({ error: error.message });
     }
   }
