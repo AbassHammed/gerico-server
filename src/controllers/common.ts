@@ -9,7 +9,7 @@ export class CommonUtils {
       const isAdmin = await checkAdmin(req.user.uid);
       if (!isAdmin) {
         res.status(401).json({
-          error: `Vous avez essayé d'acccéder à une page qui nécéssite des droits adminstrateurs`,
+          error: `Vous avez essayé d'accéder à une page nécessitant des droits administrateurs`,
           code: 'UNAUTHORIZED',
         });
         return;
@@ -28,7 +28,7 @@ export class CommonUtils {
       const isAdmin = await checkAdmin(req.user.uid);
       if (!isAdmin) {
         res.status(401).json({
-          error: `Vous avez essayé d'acccéder à une page qui nécéssite des droits adminstrateurs`,
+          error: `Vous avez essayé d'accéder à une page nécessitant des droits administrateurs`,
           code: 'UNAUTHORIZED',
         });
         return;

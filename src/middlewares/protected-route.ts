@@ -43,7 +43,7 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
 
     next();
   } catch (error: any) {
-    logservice.error('Error in require user middleware', error.message);
+    logservice.error('Erreur dans require user middleware', error.message);
     res.status(401).json({ error: error.message });
   }
 };

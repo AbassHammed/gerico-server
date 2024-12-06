@@ -21,10 +21,10 @@ export const createUserSchema = object({
     address_line1: string({ required_error: `Le champ 'Adresse ligne 1' est requis` }),
     address_line2: string().optional(),
     city: string({ required_error: 'La ville est requise' }),
-    postal_code: string({ required_error: 'Le Code Postal est requis' }),
+    postal_code: string({ required_error: 'Le Code postal est requis' }),
     country: string({ required_error: 'Le pays est requis' }),
     date_of_birth: string({ required_error: 'La date de naissance est requise' }),
-    social_security_number: string({ required_error: 'Le numéro de Sécurité Social est requis' }),
+    social_security_number: string({ required_error: 'Le numéro de Sécurité Sociale est requis' }),
     remaining_leave_balance: number({
       required_error: `Le nombre d'heures de travail par mois est requis`,
     }),
@@ -62,11 +62,11 @@ export const loginSchema = object({
 
 export const resetPasswordSchema = object({
   body: object({
-    uid: string({ required_error: `L'identifiant de utilisateur est requis` }),
+    uid: string({ required_error: `L'identifiant de l'utilisateur est requis` }),
     reset_code: string({ required_error: 'Le code de réinitialisation est requis' }),
     password: string({ required_error: 'Le mot de passe est requis' }).min(
       8,
-      'Password must be at least 8 characters long',
+      'Veuillez saisir un mot de passe comportant au moins 8 caractère.',
     ),
     confirm_password: string({ required_error: 'La confirmation du mot de passe est requise' }),
   }).refine(data => data.password === data.confirm_password, {
@@ -90,7 +90,7 @@ export const changeDefaultPasswordSchema = object({
 
 export const resendResetCodeSchema = object({
   body: object({
-    uid: string({ required_error: `L'identifiant de utilisateur est requis` }),
+    uid: string({ required_error: `L'identifiant de m'utilisateur est requis` }),
   }),
 });
 

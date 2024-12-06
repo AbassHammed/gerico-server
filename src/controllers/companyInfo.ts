@@ -21,13 +21,13 @@ export class CompanyInfoController {
 
       if (!isAdmin) {
         return res.status(401).json({
-          error: `Vous avez essayé d'acccéder à une page qui nécéssite des droits adminstrateurs`,
+          error: `Vous avez essayé d'accéder à une page nécessitant des droits administrateurs`,
         });
       }
 
       const data = req.body;
       await CompanyRepository.save(data);
-      res.status(201).json({ message: 'Votre entreprise a été ajoutée avec succès' });
+      res.status(201).json({ message: 'Votre entreprise a été ajoutée avec succès.' });
     } catch (error) {
       logservice.error('[create$CompanyInfoController]', error);
       res.status(500).json({ error: error.message });
@@ -40,7 +40,7 @@ export class CompanyInfoController {
 
       if (!isAdmin) {
         return res.status(401).json({
-          error: `Vous avez essayé d'acccéder à une page qui nécéssite des droits adminstrateurs`,
+          error: `Vous avez essayé d'accéder à une page nécessitant des droits administrateurs`,
         });
       }
 
@@ -49,7 +49,7 @@ export class CompanyInfoController {
       if (!company) {
         return res
           .status(404)
-          .json({ message: `Nous n'avons pas pu trouver l'entreprise que vous recherchez` });
+          .json({ message: `Nous n'avons pas trouvé l'entreprise que vous recherchez.` });
       }
       res.status(200).json(company);
     } catch (error) {
@@ -64,7 +64,7 @@ export class CompanyInfoController {
 
       if (!isAdmin) {
         return res.status(401).json({
-          error: `Vous avez essayé d'acccéder à une page qui nécéssite des droits adminstrateurs`,
+          error: `Vous avez essayé d'accéder à une page nécessitant des droits administrateurs`,
         });
       }
 
@@ -72,7 +72,7 @@ export class CompanyInfoController {
       await CompanyRepository.update(data);
       res
         .status(200)
-        .json({ message: `Les informations de l'entreprise ont été mise à jour avec succès` });
+        .json({ message: `Les informations de l'entreprise ont été mises à jour avec succès.` });
     } catch (error) {
       logservice.error('[update$CompanyInfoController]', error);
       res.status(500).json({ error: error.message });
@@ -84,7 +84,7 @@ export class CompanyInfoController {
 
     if (!isAdmin) {
       return res.status(401).json({
-        error: `Vous avez essayé d'acccéder à une page qui nécéssite des droits adminstrateurs`,
+        error: `Vous avez essayé d'accéder à une page nécessitant des droits administrateurs`,
       });
     }
 
@@ -92,7 +92,7 @@ export class CompanyInfoController {
       const { siret } = req.params;
       await CompanyRepository.delete(siret);
       res.status(200).json({
-        message: `Les informations de l'entreprise ont été supprimée de notre base de données avec succès`,
+        message: `Les informations de l'entreprise ont été supprimées de notre base de données avec succès.`,
       });
     } catch (error) {
       logservice.error('[delete$CompanyInfoController]', error);
