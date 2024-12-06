@@ -33,38 +33,20 @@ export interface IUser {
 
 export interface IUserRowData extends IUser, RowDataPacket {}
 
-export interface IEmployee {
+export interface IPayslip {
+  pid: string;
   uid: string;
-  civility: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone_number: string;
-  password: string;
-  employee_post: 'employee' | 'manager';
-  // ce champ me parait redondant par rapport au `employee_post` mais on peut
-  //justifier sa presence par le fait que l'entreprise peut decider de laisser
-  //seulement certains manager de gerer les congées et fdp
-  is_admin: boolean;
-  hire_date: Date;
-  created_at: Date;
-  updated_at: Date;
-  departure_date?: Date;
-  is_archived: boolean;
-  reset_code?: string;
-  address_line1: string;
-  address_line2?: string;
-  city: string;
-  postal_code: string;
-  state: string;
-  country: string;
-  dob: Date;
-  ss_number: string;
-  work_hours_month: number;
-  contrat_type: string;
-  marital_status: 'married' | 'divorced' | 'single' | 'partnership' | 'widowed' | string;
-  dependents: number;
+  gross_salary: string;
+  net_salary: string;
+  start_period: Date;
+  end_period: Date;
+  pay_date: Date;
+  total_hours_worked: string;
+  hourly_rate: number;
+  path_to_pdf: string;
 }
+
+export interface IPayslipRow extends IPayslip, RowDataPacket {}
 
 export interface IIssueReporter {
   issue_id: string;
@@ -78,26 +60,6 @@ export interface IIssueReporter {
 
 export interface IIssueReporterRow extends IIssueReporter, RowDataPacket {}
 
-export interface IEmployeeRow extends IEmployee, RowDataPacket {}
-
-export interface IEmployeeLog extends RowDataPacket {
-  log_id: string;
-  uid: string;
-  request_type: 'leave' | 'profile_update' | 'other';
-  message: string;
-  log_timestamp: Date;
-}
-
-export interface ILeaveRequest extends RowDataPacket {
-  leave_request_id: string;
-  uid: string;
-  request_status: 'pending' | 'approved' | 'rejected';
-  created_at: Date;
-  start_date: Date;
-  end_date: Date;
-  reason: string;
-}
-
 export interface ISSThreshold {
   threshold_id: string;
   threshold_name: string;
@@ -105,6 +67,7 @@ export interface ISSThreshold {
   max_value: number;
   is_ceiling: boolean;
 }
+export interface ISSThresholdRow extends ISSThreshold, RowDataPacket {}
 
 export interface IDeduction {
   deduction_id: string;
@@ -116,8 +79,6 @@ export interface IDeduction {
 }
 
 export interface IDeductionRow extends IDeduction, RowDataPacket {}
-
-export interface ISSThresholdRow extends ISSThreshold, RowDataPacket {}
 
 export interface ICompanyInfo {
   siret: string;
