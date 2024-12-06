@@ -1,6 +1,6 @@
 import { object, string, TypeOf, number, boolean } from 'zod';
 
-export const createEmployeeSchema = object({
+export const createUserSchema = object({
   body: object({
     civility: string({ required_error: 'La civilité est requise' }),
     first_name: string({ required_error: 'Le prénom est requis' })
@@ -75,12 +75,12 @@ export const resetPasswordSchema = object({
   }),
 });
 
-// for simplification we are expect the minimum critere for a password to be handle on the front, since we are also using zod there
+// for simplification we are expect the minimum critere for a password to be handle on the front, since we are also using zod and yup there
 export const changeDefaultPasswordSchema = object({
   body: object({
     password: string({ required_error: 'Le mot de passe est requis' })
       .min(8, 'Veuillez saisir un mot de passe comportant au moins 8 caractère.')
-      .max(16, 'Veuillez saisir un mot de passe de 16 caractères maximum.'),
+      .max(16, 'Veuillez saisir un mot de passe de 16 caractères maximum.'), // the actual max Lenght of a password is 72 on the front
     confirmPassword: string({ required_error: 'La confirmation du mot de passe est requise' }),
   }).refine(data => data.password === data.confirmPassword, {
     message: 'Les mots de passe ne correspondent pas',
@@ -94,7 +94,7 @@ export const resendResetCodeSchema = object({
   }),
 });
 
-export type CreateEmployeeInput = Required<TypeOf<typeof createEmployeeSchema>['body']>;
+export type CreateUserInput = Required<TypeOf<typeof createUserSchema>['body']>;
 
 export type ForgotPasswordInput = TypeOf<typeof forgotPasswordSchema>['body'];
 

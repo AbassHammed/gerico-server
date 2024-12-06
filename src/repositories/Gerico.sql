@@ -42,33 +42,44 @@ CREATE TABLE users (
     FOREIGN KEY (company_id) REFERENCES company_info(siret) ON DELETE SET NULL
 );
 
-CREATE TABLE leave_requests (
-    leave_request_id VARCHAR(16) PRIMARY KEY,
-    uid VARCHAR(36) NOT NULL,
-    request_status ENUM('approved', 'rejected', 'pending') NOT NULL,
-    start_leave_request DATETIME NOT NULL,
-    end_leave_request DATETIME NOT NULL,
-    request_created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    reason TEXT,
-    leave_type ENUM('paid', 'unpaid', 'sick', 'maternity', 'other') NOT NULL,
-    FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE
-);
-
-CREATE TABLE users_logs (
-    log_id VARCHAR(16) PRIMARY KEY,
-    uid VARCHAR(36) NOT NULL,
-    log_type ENUM('leave', 'profile_update', 'other') NOT NULL,
-    log_message TEXT,
-    log_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE
-);
-
 CREATE TABLE issue_reports (
     issue_id VARCHAR(36) PRIMARY KEY,
-    issue_type ENUM('auth', 'leave', 'payslip', 'other') NOT NULL,
-    priority ENUM('average', 'normal', 'high') NOT NULL,
-    subject VARCHAR(50),
+    issue_type VARCHAR(255) NOT NULL,
+    priority VARCHAR(255) NOT NULL,
+    subject VARCHAR(255),
     message TEXT,
     solved BOOLEAN DEFAULT FALSE,
     issue_date DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE social_security_thresholds (
+	threshold_id VARCHAR(11) PRIMARY KEY,
+	threshold_name VARCHAR(50) NOT NULL,
+	min_value DECIMAL(10, 2) NOT NULL,
+	max_value DECIMAL(10, 2),
+	is_ceiling BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE deductions (
+	deduction_id VARCHAR(16) PRIMARY KEY,
+	deduction_type VARCHAR(100) NOT NULL,
+	deduction_name VARCHAR(100) NOT NULL,
+	part_salarial DECIMAL(8, 6) NOT NULL,
+	part_patronal DECIMAL(8, 6) NOT NULL,
+	threshold_id VARCHAR(16),
+	FOREIGN KEY (threshold_id) REFERENCES social_security_thresholds(threshold_id) ON DELETE CASCADE
+);
+
+CREATE TABLE pay_slips (
+	pid VARCHAR(36) PRIMARY KEY,
+	uid VARCHAR(36) NOT NULL,
+	gross_salary DECIMAL(20, 2) NOT NULL,
+	net_salary DECIMAL(20, 2) NOT NULL,
+	start_period DATE NOT NULL,
+	end_period DATE NOT NULL,
+	pay_date DATE NOT NULL,
+	total_hours_worked TEXT NOT NULL,
+	hourly_rate DECIMAL(5, 2),
+	path_to_pdf TEXT DEFAULT NULL,
+	FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE
 );

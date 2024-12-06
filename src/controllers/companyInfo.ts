@@ -2,8 +2,9 @@ import { Request, Response } from 'express';
 import CompanyRepository from '../repositories/companyInfo';
 import userRepository from '../repositories/users';
 import { CompanyInfoBodyType } from '../middlewares/companyInfo.middleware';
+import { logservice } from '../services/loggerService';
 
-async function checkAdmin(adminId: string) {
+export async function checkAdmin(adminId: string) {
   const admin = await userRepository.retrieveById(adminId);
 
   if (!admin || !admin.is_admin) {
@@ -28,6 +29,7 @@ export class CompanyInfoController {
       await CompanyRepository.save(data);
       res.status(201).json({ message: 'Votre entreprise a été ajoutée avec succès' });
     } catch (error) {
+      logservice.error('[create$CompanyInfoController]', error);
       res.status(500).json({ error: error.message });
     }
   }
@@ -51,6 +53,7 @@ export class CompanyInfoController {
       }
       res.status(200).json(company);
     } catch (error) {
+      logservice.error('[getById$CompanyInfoController]');
       res.status(500).json({ error: error.message });
     }
   }
@@ -71,6 +74,7 @@ export class CompanyInfoController {
         .status(200)
         .json({ message: `Les informations de l'entreprise ont été mise à jour avec succès` });
     } catch (error) {
+      logservice.error('[update$CompanyInfoController]', error);
       res.status(500).json({ error: error.message });
     }
   }
@@ -87,12 +91,11 @@ export class CompanyInfoController {
     try {
       const { siret } = req.params;
       await CompanyRepository.delete(siret);
-      res
-        .status(200)
-        .json({
-          message: `Les informations de l'entreprise ont été supprimée de notre base de données avec succès`,
-        });
+      res.status(200).json({
+        message: `Les informations de l'entreprise ont été supprimée de notre base de données avec succès`,
+      });
     } catch (error) {
+      logservice.error('[delete$CompanyInfoController]', error);
       res.status(500).json({ error: error.message });
     }
   }

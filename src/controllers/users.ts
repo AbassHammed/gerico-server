@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import {
   ChangeDefaultPasswordInput,
-  CreateEmployeeInput,
+  CreateUserInput,
   ForgotPasswordInput,
   LoginInput,
   ResendResetPasswordCodeInput,
   ResetPasswordInput,
-} from '../middlewares/employee.middleware';
+} from '../middlewares/users.middleware';
 import usersRepo from '../repositories/users';
 import bcryptjs from 'bcryptjs';
 import passwordManager from '../services/passwordManager';
@@ -40,7 +40,7 @@ function generateRandomCode(): string {
  */
 
 export class UsersController {
-  async create(req: Request<object, object, CreateEmployeeInput>, res: Response) {
+  async create(req: Request<object, object, CreateUserInput>, res: Response) {
     try {
       const { email, last_name, date_of_birth, hire_date } = req.body;
 
@@ -85,15 +85,11 @@ export class UsersController {
       const result = await usersRepo.save(newEmployee);
 
       if (result !== true) {
-        return res
-          .status(401)
-          .json({
-            error: `Une erreur s'est produite lors de la création de l'utilisateur. Veuillez réessayer.`,
-          });
+        return res.status(401).json({
+          error: `Une erreur s'est produite lors de la création de l'utilisateur. Veuillez réessayer.`,
+        });
       }
 
-      // we may need to implement a services that retries sending the email for sometimes incase of error
-      // or maybe we need a better implementation
       await emailService.sendWelcomeEmail(newEmployee.email, {
         civility: newEmployee.civility,
         lastName: newEmployee.last_name,
@@ -102,7 +98,7 @@ export class UsersController {
 
       res.status(201).json({ message: `L'employé a été créé avec succès.` });
     } catch (error) {
-      logservice.info('[create]', error);
+      logservice.info('[create$UsersController]', error);
       res.status(500).json({ error: `Erreur interne du serveur.` });
     }
   }
@@ -114,12 +110,10 @@ export class UsersController {
       const user = await usersRepo.retrieveByEmail(email);
 
       if (!user) {
-        return res
-          .status(400)
-          .json({
-            error: `Aucun utilisateur trouvé avec l'adresse e-mail fournie.`,
-            code: 'ENOTFOUND',
-          });
+        return res.status(400).json({
+          error: `Aucun utilisateur trouvé avec l'adresse e-mail fournie.`,
+          code: 'ENOTFOUND',
+        });
       }
 
       const isPasswordCorrect = await bcryptjs.compare(password, user.hashed_password);
@@ -146,7 +140,7 @@ export class UsersController {
 
       res.status(200).json({ token, user });
     } catch (error) {
-      logservice.error('[login]', error);
+      logservice.error('[login$UsersController]', error);
       res.status(500).json({ error: `Erreur interne du serveur.` });
     }
   }
@@ -185,7 +179,7 @@ export class UsersController {
 
       res.status(201).json({ uid: updatedUser.uid, sent: true });
     } catch (error) {
-      logservice.error('[forgotPassword]', error);
+      logservice.error('[forgotPassword$UsersController]', error);
       res.status(500).json({ error: error.message });
     }
   }
@@ -227,7 +221,7 @@ export class UsersController {
 
       res.status(200).json({ token, user: updatedUser });
     } catch (error) {
-      logservice.error('[changeDefaultPassword]', error);
+      logservice.error('[changeDefaultPassword$UsersController]', error);
       res.status(500).json({ error: `Une erreur interne est survenue.` });
     }
   }
@@ -264,7 +258,7 @@ export class UsersController {
 
       res.status(201).json({ result: true });
     } catch (error) {
-      logservice.error('[resetPassword]', error);
+      logservice.error('[resetPassword$UsersController]', error);
       res.status(500).json({ error: `Erreur interne du serveur.` });
     }
   }
@@ -296,14 +290,14 @@ export class UsersController {
 
       res.status(200).json({ sent: true });
     } catch (error) {
-      logservice.error('[resendPasswordCode]', error);
+      logservice.error('[resendPasswordCode$UsersController]', error);
       res
         .status(500)
         .json({ error: `Une erreur inconnue est survenue lors de la réexpédition de l'e-mail.` });
     }
   }
 
-  async update(req: Request<any, object, CreateEmployeeInput>, res: Response) {
+  async update(req: Request<any, object, CreateUserInput>, res: Response) {
     try {
       const admin = await usersRepo.retrieveById(req.user.uid);
 
@@ -343,7 +337,7 @@ export class UsersController {
 
       res.status(200).json({ result: true });
     } catch (error) {
-      logservice.error('[update]', error);
+      logservice.error('[update$UsersController]', error);
       res.status(500).json({ error: `Erreur interne du serveur.` });
     }
   }
@@ -361,7 +355,7 @@ export class UsersController {
 
       res.status(200).json({ user });
     } catch (error) {
-      logservice.error('[retrieve]', error);
+      logservice.error('[retrieve$UsersController]', error);
       res.status(500).json({ error: `Erreur interne du serveur.` });
     }
   }
@@ -380,7 +374,7 @@ export class UsersController {
 
       res.status(200).json({ users });
     } catch (error) {
-      logservice.error('[retrieveAll]', error);
+      logservice.error('[retrieveAll$UsersController]', error);
       res.status(500).json({ error: `Erreur interne du serveur.` });
     }
   }
@@ -395,7 +389,7 @@ export class UsersController {
 
       res.status(200).json({ user });
     } catch (error) {
-      logservice.error('[getUser]', error);
+      logservice.error('[getUser$UsersController]', error);
       res.status(500).json({ error: `Erreur interne du serveur.` });
     }
   }
@@ -442,7 +436,7 @@ export class UsersController {
 
       res.status(200).json({ result: true });
     } catch (error) {
-      logservice.error('[resetToDefaultPassword]', error);
+      logservice.error('[resetToDefaultPassword$UsersController]', error);
       res.status(500).json({ error: `Erreur interne du serveur.` });
     }
   }
@@ -484,7 +478,7 @@ export class UsersController {
 
       res.status(200).json({ sent: true, message: `L'e-mail a été envoyé avec succès.` });
     } catch (error) {
-      logservice.error('[resendWelcomeEmail]', error);
+      logservice.error('[resendWelcomeEmail$UsersController]', error);
       res.status(500).json({ error: `Erreur interne du serveur.` });
     }
   }
@@ -519,7 +513,7 @@ export class UsersController {
 
       res.status(200).json({ result: true, message: `L'utilisateur a été archivé avec succès.` });
     } catch (error) {
-      logservice.error('[archiveUser]', error);
+      logservice.error('[archiveUser$UsersController]', error);
       res.status(500).json({ error: `Erreur interne du serveur.` });
     }
   }
