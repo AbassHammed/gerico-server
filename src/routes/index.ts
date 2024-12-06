@@ -30,5 +30,6 @@ export default class Server {
     app.use(cors(corsOptions));
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
+    app.use(express.raw({ type: 'application/pdf', limit: '10mb' }));
   }
 }

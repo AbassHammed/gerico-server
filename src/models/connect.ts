@@ -12,3 +12,17 @@ export default mysql.createConnection({
   database: process.env.MYSQL_DB,
   ssl: sslCert ? { ca: sslCert } : undefined,
 });
+
+import { S3 } from '@aws-sdk/client-s3';
+
+const s3Client = new S3({
+  forcePathStyle: false,
+  endpoint: 'https://ams3.digitaloceanspaces.com',
+  region: 'us-east-1',
+  credentials: {
+    accessKeyId: process.env.DO_ACCESS_KEY,
+    secretAccessKey: process.env.DO_SECRET_KEY,
+  },
+});
+
+export { s3Client };

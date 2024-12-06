@@ -29,7 +29,6 @@ export class PayslipController {
         start_period: startPeriod,
         end_period: endPeriod,
         pay_date: payDate,
-        path_to_pdf: null,
       };
 
       const result = await payslipRepo.save(newPayslip);
