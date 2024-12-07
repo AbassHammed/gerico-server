@@ -17,7 +17,7 @@ class CommonRouter {
   initRouter() {
     this.router.get('/thresholds', requireAuth, this.controller.retrieveThresholds);
     this.router.get('/deductions', requireAuth, this.controller.retrieveDeductions);
-    this.router.post('/upload', async (req, res) => {
+    this.router.post('/upload', requireAuth, async (req, res) => {
       const fileName = req.get('Content-Disposition')?.split('filename=')[1]?.replace(/"/g, '');
 
       if (!fileName) {
