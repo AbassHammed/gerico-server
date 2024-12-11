@@ -1,8 +1,19 @@
-import { IRepository, IUser, IUserRowData } from '../models/interface';
+/* eslint-disable brace-style */
+import {
+  IRepository,
+  IUser,
+  IUserRowData,
+  PaginatedResult,
+  PaginationParams,
+} from '../models/interface';
 import connection from '../models/connect';
 import { ResultSetHeader } from 'mysql2';
+import { RepositoryEntity } from './entity';
 
-class UserRepository implements Required<IRepository<IUser>> {
+class UserRepository
+  extends RepositoryEntity<IUser, IUserRowData>
+  implements Required<IRepository<IUser>>
+{
   save(t: IUser): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query<ResultSetHeader>(
@@ -48,16 +59,9 @@ class UserRepository implements Required<IRepository<IUser>> {
     });
   }
 
-  retrieveAll(): Promise<IUser[]> {
-    return new Promise((resolve, reject) => {
-      connection.query<IUserRowData[]>('SELECT * FROM users', (err, res) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(res);
-        }
-      });
-    });
+  retrieveAll(params: PaginationParams): Promise<PaginatedResult<IUser>> {
+    const query = 'SELECT SQL_CALC_FOUND_ROWS * FROM users LIMIT ? OFFSET ?';
+    return this.executePaginatedQuery(query, [params.limit, params.offset]);
   }
 
   retrieveById(id: string | number): Promise<IUser> {

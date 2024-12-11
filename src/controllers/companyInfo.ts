@@ -60,7 +60,7 @@ export class CompanyInfoController {
           ApiResponse.error(404, `Nous n'avons pas pu trouver l'entreprise que vous recherchez`),
         );
       }
-      return res.sendResponse(ApiResponse.success(200, { company }));
+      return res.sendResponse(ApiResponse.success(200, company));
     } catch (error) {
       logservice.error('[getById$CompanyInfoController]', error);
       return res.sendResponse(ApiResponse.error(500, error.message));
@@ -86,7 +86,7 @@ export class CompanyInfoController {
           ApiResponse.error(404, `Nous n'avons pas pu trouver l'entreprise que vous recherchez`),
         );
       }
-      return res.sendResponse(ApiResponse.success(200, { company }));
+      return res.sendResponse(ApiResponse.success(200, company));
     } catch (error) {
       logservice.error('[getCompanyFromUser$CompanyInfoController]', error);
       return res.sendResponse(ApiResponse.error(500, error.message));

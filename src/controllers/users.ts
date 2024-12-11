@@ -11,10 +11,11 @@ import usersRepo from '../repositories/users';
 import bcryptjs from 'bcryptjs';
 import passwordManager from '../services/passwordManager';
 import { IUser } from '../models/interface';
-import { generateId } from '../utils/misc';
+import { generateId, getPaginationParams } from '../utils/misc';
 import { logservice } from '../services/loggerService';
 import jwtServices from '../services/jwtServices';
 import emailService from '../services/mail/mailServices';
+import { ApiResponse } from '../services/ApiResponse';
 
 function generateRandomCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -369,10 +370,10 @@ export class UsersController {
           .status(401)
           .json({ error: 'Accès refusé : utilisateur non autorisé', code: 'UNAUTHORIZED' });
       }
+      const paginationParams = getPaginationParams(req.query);
+      const users = await usersRepo.retrieveAll(paginationParams);
 
-      const users = await usersRepo.retrieveAll();
-
-      res.status(200).json({ users });
+      res.sendResponse(ApiResponse.success(200, users));
     } catch (error) {
       logservice.error('[retrieveAll$UsersController]', error);
       res.status(500).json({ error: `Erreur interne du serveur.` });

@@ -14,7 +14,7 @@ export class CommonUtils {
 
       const thresholds = await pdfUtils.getThresholds();
 
-      return res.sendResponse(ApiResponse.success(200, { thresholds }));
+      return res.sendResponse(ApiResponse.success(200, thresholds));
     } catch (error) {
       logservice.error('[retrieveThresholds$CommonUtils]', error);
       return res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));
@@ -29,7 +29,7 @@ export class CommonUtils {
 
       const deductions = await pdfUtils.getDeductions();
 
-      return res.sendResponse(ApiResponse.success(200, { deductions }));
+      return res.sendResponse(ApiResponse.success(200, deductions));
     } catch (error) {
       logservice.error('[retrieveDeductions$CommonUtils]', error);
       return res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));
