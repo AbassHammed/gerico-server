@@ -1,3 +1,4 @@
+/* eslint-disable brace-style */
 import {
   IPayslip,
   IPayslipRow,
@@ -6,8 +7,12 @@ import {
   PaginationParams,
 } from '../models/interface';
 import connection from '../models/connect';
+import { RepositoryEntity } from './entity';
 
-class PayslipRepository implements IRepository<IPayslip> {
+class PayslipRepository
+  extends RepositoryEntity<IPayslip, IPayslipRow>
+  implements IRepository<IPayslip>
+{
   save(t: IPayslip): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query(
@@ -35,42 +40,7 @@ class PayslipRepository implements IRepository<IPayslip> {
     });
   }
 
-  private async executePaginatedQuery(
-    query: string,
-    params: any[],
-  ): Promise<PaginatedResult<IPayslip>> {
-    return new Promise((resolve, reject) => {
-      connection.query<IPayslipRow[]>(query, params, (err, rows) => {
-        if (err) {
-          reject(err);
-        } else {
-          connection.query<{ total: number }[]>(
-            'SELECT FOUND_ROWS() as total',
-            (err, totalRows) => {
-              if (err) {
-                reject(err);
-              } else {
-                const totalItems = totalRows[0].total;
-                const totalPages = Math.ceil(totalItems / params[params.length - 2]);
-                resolve({
-                  data: rows,
-                  pagination: {
-                    currentPage:
-                      Math.floor(params[params.length - 1] / params[params.length - 2]) + 1,
-                    limit: params[params.length - 2],
-                    totalPages,
-                    totalItems,
-                  },
-                });
-              }
-            },
-          );
-        }
-      });
-    });
-  }
-
-  async retrieveAllPayslips(params: PaginationParams): Promise<PaginatedResult<IPayslip>> {
+  async retrieveAll(params: PaginationParams): Promise<PaginatedResult<IPayslip>> {
     const query = 'SELECT SQL_CALC_FOUND_ROWS * FROM pay_slips LIMIT ? OFFSET ?';
     return this.executePaginatedQuery(query, [params.limit, params.offset]);
   }

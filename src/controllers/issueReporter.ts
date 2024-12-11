@@ -4,7 +4,7 @@ import {
   UpdateIssueSchemaParams,
 } from '../middlewares/issueReporter.middleware';
 import { IIssueReporter } from '../models/interface';
-import { generateId } from '../utils/misc';
+import { generateId, getPaginationParams } from '../utils/misc';
 import issueReporter from '../repositories/issueReporter';
 import { logservice } from '../services/loggerService';
 import { ApiResponse } from '../services/ApiResponse';
@@ -29,8 +29,9 @@ export class IssueReporterController {
 
   async getIssues(req: Request, res: Response) {
     try {
-      const result = await issueReporter.retrieveAll();
-      res.status(200).json({ result });
+      const paginationParams = getPaginationParams(req.query);
+      const result = await issueReporter.retrieveAll(paginationParams);
+      res.sendResponse(ApiResponse.success(200, result));
     } catch (error) {
       logservice.error('[getIssues$IssueReporterController]', error);
       res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));
@@ -51,8 +52,9 @@ export class IssueReporterController {
 
   async getIssuesNotSolved(req: Request, res: Response) {
     try {
-      const result = await issueReporter.retrieveNotSolved();
-      res.status(200).json({ result });
+      const paginationParams = getPaginationParams(req.query);
+      const result = await issueReporter.retrieveNotSolved(paginationParams);
+      res.sendResponse(ApiResponse.success(200, result));
     } catch (error) {
       logservice.error('[getIssuesNotSolved$IssueReporterController]', error);
       res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));

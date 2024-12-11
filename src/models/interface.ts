@@ -130,7 +130,7 @@ export interface IRepository<T> {
    * Retrieves all entities from the repository.
    * @returns {Promise<T[]>} - A promise that resolves to an array of entities
    */
-  retrieveAll?(): Promise<T[]>;
+  retrieveAll?(params: PaginationParams): Promise<PaginatedResult<T>>;
 
   /**
    * Retrieves a single entity by its ID.

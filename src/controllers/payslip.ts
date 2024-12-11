@@ -31,7 +31,9 @@ export class PayslipController {
       };
 
       await payslipRepo.save(newPayslip);
-      res.status(200).json({ message: 'La fiche de paie est bien enregistré.' });
+      res.sendResponse(
+        ApiResponse.success(200, undefined, 'La fiche de paie est bien enregistré.'),
+      );
     } catch (error) {
       logservice.error('[create$PayslipController', error);
       res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));
@@ -68,8 +70,8 @@ export class PayslipController {
         pay_date: payDate,
       };
 
-      const result = await payslipRepo.update(newPayslip);
-      res.status(200).json({ result });
+      await payslipRepo.update(newPayslip);
+      res.sendResponse(ApiResponse.success(200));
     } catch (error) {
       logservice.error('[update$PayslipController]', error);
       res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));
@@ -85,9 +87,9 @@ export class PayslipController {
       }
 
       const paginationParams = getPaginationParams(req.query);
-      const payslips = await payslipRepo.retrieveAllPayslips(paginationParams);
+      const payslips = await payslipRepo.retrieveAll(paginationParams);
 
-      res.status(200).json({ payslips });
+      res.sendResponse(ApiResponse.success(200, payslips));
     } catch (error) {
       logservice.error('[getAll$PayslipController]', error);
       res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));
@@ -101,7 +103,7 @@ export class PayslipController {
       const paginationParams = getPaginationParams(req.query);
       const payslips = await payslipRepo.retrieveByUser(uid.trim(), paginationParams);
 
-      res.status(200).json({ payslips });
+      res.sendResponse(ApiResponse.success(200, payslips));
     } catch (error) {
       logservice.error('[getAllUserPayslips$PayslipController]', error);
       res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));
