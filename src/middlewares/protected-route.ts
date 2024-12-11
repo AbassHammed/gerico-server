@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwtServices from '../services/jwtServices';
 import userRepo from '../repositories/users';
 import { logservice } from '../services/loggerService';
+import { ApiResponse } from '../services/ApiResponse';
 
 declare global {
   namespace Express {
@@ -24,19 +25,19 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
     }
 
     if (!token) {
-      return res.status(401).json({ error: 'Non autorisé - Aucun token fourni' });
+      return res.sendResponse(ApiResponse.error(401, 'Non autorisé - Aucun token fourni'));
     }
 
     const decoded = jwtServices.decode(token);
 
     if (!decoded) {
-      return res.status(401).json({ error: 'Non autorisé - token invalide' });
+      return res.sendResponse(ApiResponse.error(401, 'Non autorisé - token invalide'));
     }
 
     const user = await userRepo.retrieveById(decoded.uid);
 
     if (!user) {
-      return res.status(401).json({ error: 'Utilisateur introuvable' });
+      return res.sendResponse(ApiResponse.error(401, 'Utilisateur introuvable'));
     }
 
     req.user = user;
@@ -44,6 +45,6 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
     next();
   } catch (error: any) {
     logservice.error('Error in require user middleware', error.message);
-    res.status(401).json({ error: error.message });
+    res.sendResponse(ApiResponse.error(401, error.message));
   }
 };

@@ -1,5 +1,21 @@
 import { RowDataPacket } from 'mysql2';
 
+export interface PaginationParams {
+  page?: number;
+  limit?: number;
+  offset?: number;
+}
+
+export interface PaginatedResult<T> {
+  data: T[];
+  pagination: {
+    currentPage: number;
+    limit: number;
+    totalPages: number;
+    totalItems: number;
+  };
+}
+
 export interface IUser {
   uid: string;
   civility: string;

@@ -3,9 +3,10 @@ import { Request, Response } from 'express';
 import { CreatePayslipInput } from '../middlewares/payslip.middleware';
 import { checkAdmin } from './companyInfo';
 import { IPayslip } from '../models/interface';
-import { generateId } from '../utils/misc';
+import { generateId, getPaginationParams } from '../utils/misc';
 import payslipRepo from '../repositories/payslip';
 import { logservice } from '../services/loggerService';
+import { ApiResponse } from '../services/ApiResponse';
 
 export class PayslipController {
   async create(req: Request<object, object, CreatePayslipInput>, res: Response) {
@@ -13,9 +14,7 @@ export class PayslipController {
       const isAdmin = checkAdmin(req.user.uid);
 
       if (!isAdmin) {
-        return res
-          .status(401)
-          .json({ error: `Accès refusé : utilisateur non autorisé`, code: 'UNAUTHORIZED' });
+        return res.sendResponse(ApiResponse.error(401, 'Accès refusé : utilisateur non autorisé'));
       }
 
       const { start_period, end_period, pay_date } = req.body;
@@ -35,7 +34,7 @@ export class PayslipController {
       res.status(200).json({ message: 'La fiche de paie est bien enregistré.' });
     } catch (error) {
       logservice.error('[create$PayslipController', error);
-      res.status(501).json({ error: 'Erreur interne du serveur' });
+      res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));
     }
   }
 
@@ -44,9 +43,7 @@ export class PayslipController {
       const isAdmin = checkAdmin(req.user.uid);
 
       if (!isAdmin) {
-        return res
-          .status(401)
-          .json({ error: `Accès refusé : utilisateur non autorisé`, code: 'UNAUTHORIZED' });
+        return res.sendResponse(ApiResponse.error(401, 'Accès refusé : utilisateur non autorisé'));
       }
 
       const { pid } = req.params as { pid: string };
@@ -75,7 +72,7 @@ export class PayslipController {
       res.status(200).json({ result });
     } catch (error) {
       logservice.error('[update$PayslipController]', error);
-      res.status(501).json({ error: 'Erreur interne du serveur' });
+      res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));
     }
   }
 
@@ -84,17 +81,16 @@ export class PayslipController {
       const isAdmin = checkAdmin(req.user.uid);
 
       if (!isAdmin) {
-        return res
-          .status(401)
-          .json({ error: 'Accès refusé : utilisateur non autorisé', code: 'UNAUTHORIZED' });
+        return res.sendResponse(ApiResponse.error(401, 'Accès refusé : utilisateur non autorisé'));
       }
 
-      const payslips = await payslipRepo.retrieveAll();
+      const paginationParams = getPaginationParams(req.query);
+      const payslips = await payslipRepo.retrieveAllPayslips(paginationParams);
 
       res.status(200).json({ payslips });
     } catch (error) {
       logservice.error('[getAll$PayslipController]', error);
-      res.status(500).json({ error: 'Erreur interne du serveur.' });
+      res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));
     }
   }
 
@@ -102,12 +98,13 @@ export class PayslipController {
     try {
       const { uid } = req.params as { uid: string };
 
-      const payslips = await payslipRepo.retrieveByUser(uid.trim());
+      const paginationParams = getPaginationParams(req.query);
+      const payslips = await payslipRepo.retrieveByUser(uid.trim(), paginationParams);
 
       res.status(200).json({ payslips });
     } catch (error) {
       logservice.error('[getAllUserPayslips$PayslipController]', error);
-      res.status(500).json({ error: 'Erreur interne du serveur' });
+      res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));
     }
   }
 }

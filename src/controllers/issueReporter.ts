@@ -7,6 +7,7 @@ import { IIssueReporter } from '../models/interface';
 import { generateId } from '../utils/misc';
 import issueReporter from '../repositories/issueReporter';
 import { logservice } from '../services/loggerService';
+import { ApiResponse } from '../services/ApiResponse';
 
 export class IssueReporterController {
   async reportIssue(req: Request<object, object, CreateIssueSchemaBody>, res: Response) {
@@ -18,11 +19,11 @@ export class IssueReporterController {
         solved: false,
       };
 
-      const result = await issueReporter.save(newIssue);
-      res.status(201).json({ result });
+      await issueReporter.save(newIssue);
+      return res.sendResponse(ApiResponse.success(200, undefined));
     } catch (error) {
       logservice.error('[reportIssue$IssueReporterController]', error);
-      res.status(500).json({ error: error.message });
+      res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));
     }
   }
 
@@ -32,7 +33,7 @@ export class IssueReporterController {
       res.status(200).json({ result });
     } catch (error) {
       logservice.error('[getIssues$IssueReporterController]', error);
-      res.status(500).json({ error: error.message });
+      res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));
     }
   }
 
@@ -40,11 +41,11 @@ export class IssueReporterController {
     try {
       const { id } = req.params;
 
-      const result = await issueReporter.solved(id);
-      res.status(200).json({ result });
+      await issueReporter.solved(id.trim());
+      res.sendResponse(ApiResponse.success(200));
     } catch (error) {
       logservice.error('[markIssueAsSolved$IssueReporterController]', error);
-      res.status(500).json({ error: error.message });
+      res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));
     }
   }
 
@@ -54,7 +55,7 @@ export class IssueReporterController {
       res.status(200).json({ result });
     } catch (error) {
       logservice.error('[getIssuesNotSolved$IssueReporterController]', error);
-      res.status(500).json({ error: error.message });
+      res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));
     }
   }
 }

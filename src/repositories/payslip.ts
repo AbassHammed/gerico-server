@@ -1,4 +1,10 @@
-import { IPayslip, IPayslipRow, IRepository } from '../models/interface';
+import {
+  IPayslip,
+  IPayslipRow,
+  IRepository,
+  PaginatedResult,
+  PaginationParams,
+} from '../models/interface';
 import connection from '../models/connect';
 
 class PayslipRepository implements IRepository<IPayslip> {
@@ -29,6 +35,51 @@ class PayslipRepository implements IRepository<IPayslip> {
     });
   }
 
+  private async executePaginatedQuery(
+    query: string,
+    params: any[],
+  ): Promise<PaginatedResult<IPayslip>> {
+    return new Promise((resolve, reject) => {
+      connection.query<IPayslipRow[]>(query, params, (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          connection.query<{ total: number }[]>(
+            'SELECT FOUND_ROWS() as total',
+            (err, totalRows) => {
+              if (err) {
+                reject(err);
+              } else {
+                const totalItems = totalRows[0].total;
+                const totalPages = Math.ceil(totalItems / params[params.length - 2]);
+                resolve({
+                  data: rows,
+                  pagination: {
+                    currentPage:
+                      Math.floor(params[params.length - 1] / params[params.length - 2]) + 1,
+                    limit: params[params.length - 2],
+                    totalPages,
+                    totalItems,
+                  },
+                });
+              }
+            },
+          );
+        }
+      });
+    });
+  }
+
+  async retrieveAllPayslips(params: PaginationParams): Promise<PaginatedResult<IPayslip>> {
+    const query = 'SELECT SQL_CALC_FOUND_ROWS * FROM pay_slips LIMIT ? OFFSET ?';
+    return this.executePaginatedQuery(query, [params.limit, params.offset]);
+  }
+
+  async retrieveByUser(uid: string, params: PaginationParams): Promise<PaginatedResult<IPayslip>> {
+    const query = 'SELECT SQL_CALC_FOUND_ROWS * FROM pay_slips WHERE uid = ? LIMIT ? OFFSET ?';
+    return this.executePaginatedQuery(query, [uid, params.limit, params.offset]);
+  }
+
   retrieveById(id: string | number): Promise<IPayslip> {
     return new Promise((resolve, reject) => {
       connection.query<IPayslipRow[]>('SELECT * FROM pay_slips WHERE pid = ?', [id], (err, res) => {
@@ -38,34 +89,6 @@ class PayslipRepository implements IRepository<IPayslip> {
           resolve(res?.[0]);
         }
       });
-    });
-  }
-
-  retrieveAll(): Promise<IPayslip[]> {
-    return new Promise((resolve, reject) => {
-      connection.query<IPayslipRow[]>('SELECT * FROM pay_slips', (err, res) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(res);
-        }
-      });
-    });
-  }
-
-  retrieveByUser(uid: string): Promise<IPayslip[]> {
-    return new Promise((resolve, reject) => {
-      connection.query<IPayslipRow[]>(
-        'SELECT * FROM pay_slips WHERE uid = ?',
-        [uid],
-        (err, res) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(res);
-          }
-        },
-      );
     });
   }
 

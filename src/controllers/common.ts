@@ -2,44 +2,37 @@ import { Request, Response } from 'express';
 import { logservice } from '../services/loggerService';
 import { checkAdmin } from './companyInfo';
 import pdfUtils from '../repositories/common';
+import { ApiResponse } from '../services/ApiResponse';
 
 export class CommonUtils {
   async retrieveThresholds(req: Request, res: Response) {
     try {
       const isAdmin = await checkAdmin(req.user.uid);
       if (!isAdmin) {
-        res.status(401).json({
-          error: `Vous avez essayé d'acccéder à une page qui nécéssite des droits adminstrateurs`,
-          code: 'UNAUTHORIZED',
-        });
-        return;
+        return res.sendResponse(ApiResponse.error(401, 'Accès refusé : utilisateur non autorisé'));
       }
 
       const thresholds = await pdfUtils.getThresholds();
 
-      res.status(200).json({ thresholds });
+      return res.sendResponse(ApiResponse.success(200, { thresholds }));
     } catch (error) {
       logservice.error('[retrieveThresholds$CommonUtils]', error);
-      res.status(501).json({ error: 'Erreur interne du serveur.' });
+      return res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));
     }
   }
   async retrieveDeductions(req: Request, res: Response) {
     try {
       const isAdmin = await checkAdmin(req.user.uid);
       if (!isAdmin) {
-        res.status(401).json({
-          error: `Vous avez essayé d'acccéder à une page qui nécéssite des droits adminstrateurs`,
-          code: 'UNAUTHORIZED',
-        });
-        return;
+        return res.sendResponse(ApiResponse.error(401, 'Accès refusé : utilisateur non autorisé'));
       }
 
       const deductions = await pdfUtils.getDeductions();
 
-      res.status(200).json({ deductions });
+      return res.sendResponse(ApiResponse.success(200, { deductions }));
     } catch (error) {
       logservice.error('[retrieveDeductions$CommonUtils]', error);
-      res.status(501).json({ error: 'Erreur interne du serveur.' });
+      return res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));
     }
   }
 }

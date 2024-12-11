@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import dotenv from 'dotenv';
 // The env variables needs to be configured here before importing any other file in the app entry
@@ -12,6 +13,15 @@ import express, { Application } from 'express';
 import { logservice } from './services/loggerService';
 import employee from './repositories/users';
 import Server from './routes';
+import { ApiResponse } from './services/ApiResponse';
+
+declare global {
+  namespace Express {
+    interface Response {
+      sendResponse<T>(response: ApiResponse<T>): Response;
+    }
+  }
+}
 
 const app: Application = express();
 const server: Server = new Server(app);

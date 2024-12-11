@@ -1,3 +1,5 @@
+import { PaginationParams } from '../models/interface';
+
 export function isString(str: unknown): str is string {
   return typeof str === 'string';
 }
@@ -78,4 +80,15 @@ export function shuffle<T>(array: T[], _seed?: number): void {
     array[i] = array[j];
     array[j] = temp;
   }
+}
+
+export const DEFAULT_PAGE = 1;
+export const DEFAULT_LIMIT = 10;
+
+export function getPaginationParams(query: PaginationParams): { limit: number; offset: number } {
+  const page = Math.max(1, query.page || DEFAULT_PAGE);
+  const limit = Math.max(1, Math.min(query.limit || DEFAULT_LIMIT, 100)); // Cap at 100 items per page
+  const offset = query.offset !== undefined ? query.offset : (page - 1) * limit;
+
+  return { limit, offset };
 }

@@ -5,6 +5,7 @@ import cors, { CorsOptions } from 'cors';
 import companyInfoRoutes from './companyInfo';
 import commonRoutes from './common';
 import payslipRoutes from './payslip';
+import { responseHandler } from '../middlewares/responseHandler';
 
 class Routes {
   constructor(app: Application) {
@@ -31,5 +32,6 @@ export default class Server {
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     app.use(express.raw({ type: 'application/pdf', limit: '10mb' }));
+    app.use(responseHandler);
   }
 }
