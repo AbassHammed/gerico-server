@@ -21,6 +21,12 @@ function generateRandomCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
+interface LoginResponse {
+  token: string;
+  user: IUser | null;
+  code: string | null;
+}
+
 /**
 
 ```plaintext
@@ -135,11 +141,23 @@ export class UsersController {
         browser,
       });
 
+      let response: LoginResponse = {
+        code: 'DEFAULTPASS',
+        token,
+        user: null,
+      };
+
       if (isdefaultPassword) {
-        return res.status(208).json({ code: 'DEFAULTPASS', token });
+        return res.sendResponse(ApiResponse.success(208, response));
       }
 
-      res.status(200).json({ token, user });
+      response = {
+        code: null,
+        token,
+        user,
+      };
+
+      return res.sendResponse(ApiResponse.success(200, response));
     } catch (error) {
       logservice.error('[login$UsersController]', error);
       res.status(500).json({ error: `Erreur interne du serveur.` });
