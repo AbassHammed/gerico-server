@@ -53,7 +53,30 @@ export class CompanyInfoController {
       }
       res.status(200).json(company);
     } catch (error) {
-      logservice.error('[getById$CompanyInfoController]');
+      logservice.error('[getById$CompanyInfoController]', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getCompanyFromUser(req: Request, res: Response) {
+    try {
+      const admin = await userRepository.retrieveById(req.user.uid);
+
+      if (!admin.is_admin) {
+        return res.status(401).json({
+          error: `Vous avez essayé d'acccéder à une page qui nécéssite des droits adminstrateurs`,
+        });
+      }
+
+      const company = await CompanyRepository.retrieveById(admin.company_id);
+      if (!company) {
+        return res
+          .status(404)
+          .json({ message: `Nous n'avons pas pu trouver l'entreprise que vous recherchez` });
+      }
+      res.status(200).json(company);
+    } catch (error) {
+      logservice.error('[getCompanyFromUser$CompanyInfoController]', error);
       res.status(500).json({ error: error.message });
     }
   }

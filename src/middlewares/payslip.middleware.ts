@@ -13,10 +13,8 @@ export const createPayslipSchema = object({
       required_error: "Le nombre total d'heures travaillées est requis",
     }),
     hourly_rate: number({ required_error: 'Le taux horaire est requis' }),
-    path_to_pdf: string().optional(),
+    path_to_pdf: string({ required_error: 'Le lien vers le pdf doit être fourni' }),
   }),
 });
 
-export type CreatePayslipInput = Required<
-  Omit<z.infer<typeof createPayslipSchema>['body'], 'path_to_pdf'>
-> & { path_to_pdf?: string };
+export type CreatePayslipInput = Required<z.infer<typeof createPayslipSchema>['body']>;

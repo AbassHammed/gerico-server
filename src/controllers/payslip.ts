@@ -31,8 +31,8 @@ export class PayslipController {
         pay_date: payDate,
       };
 
-      const result = await payslipRepo.save(newPayslip);
-      res.status(200).json({ result });
+      await payslipRepo.save(newPayslip);
+      res.status(200).json({ message: 'La fiche de paie est bien enregistré.' });
     } catch (error) {
       logservice.error('[create$PayslipController', error);
       res.status(501).json({ error: 'Erreur interne du serveur' });
