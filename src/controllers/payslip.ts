@@ -71,7 +71,9 @@ export class PayslipController {
       };
 
       await payslipRepo.update(newPayslip);
-      res.sendResponse(ApiResponse.success(200));
+      res.sendResponse(
+        ApiResponse.success(200, undefined, 'La fiche de paie est bien mise à jour.'),
+      );
     } catch (error) {
       logservice.error('[update$PayslipController]', error);
       res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));
