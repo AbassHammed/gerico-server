@@ -60,8 +60,14 @@ class UserRepository
   }
 
   retrieveAll(params: PaginationParams): Promise<PaginatedResult<IUser>> {
-    const query = 'SELECT SQL_CALC_FOUND_ROWS * FROM users LIMIT ? OFFSET ?';
-    return this.executePaginatedQuery(query, [params.limit, params.offset]);
+    const query = 'SELECT * FROM users LIMIT ? OFFSET ?';
+    const countQuery = 'SELECT COUNT(*) as total FROM users';
+    return this.executePaginatedQuery(
+      query,
+      [Number(params.limit), Number(params.offset)],
+      countQuery,
+      [],
+    );
   }
 
   retrieveById(id: string | number): Promise<IUser> {

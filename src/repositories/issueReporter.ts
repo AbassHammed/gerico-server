@@ -31,8 +31,14 @@ class IssueReporterRepository
   }
 
   retrieveAll(params: PaginationParams): Promise<PaginatedResult<IIssueReporter>> {
-    const query = 'SELECT SQL_CALC_FOUND_ROWS * FROM issue_reports LIMIT ? OFFSET ?';
-    return this.executePaginatedQuery(query, [params.limit, params.offset]);
+    const query = 'SELECT * FROM issue_reports LIMIT ? OFFSET ?';
+    const countQuery = 'SELECT COUNT(*) as total FROM issue_reports';
+    return this.executePaginatedQuery(
+      query,
+      [Number(params.limit), Number(params.offset)],
+      countQuery,
+      [],
+    );
   }
 
   retrieveById(id: string | number): Promise<IIssueReporter> {
@@ -69,7 +75,13 @@ class IssueReporterRepository
 
   retrieveNotSolved(params: PaginationParams): Promise<PaginatedResult<IIssueReporter>> {
     const query = 'SELECT * FROM issue_reports WHERE solved = false LIMIT ? OFFSET ?';
-    return this.executePaginatedQuery(query, [params.limit, params.offset]);
+    const countQuery = 'SELECT COUNT(*) as total FROM issue_reports WHERE solved = false';
+    return this.executePaginatedQuery(
+      query,
+      [Number(params.limit), Number(params.offset)],
+      countQuery,
+      [],
+    );
   }
 }
 

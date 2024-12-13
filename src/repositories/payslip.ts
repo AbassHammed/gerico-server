@@ -41,13 +41,25 @@ class PayslipRepository
   }
 
   async retrieveAll(params: PaginationParams): Promise<PaginatedResult<IPayslip>> {
-    const query = 'SELECT SQL_CALC_FOUND_ROWS * FROM pay_slips LIMIT ? OFFSET ?';
-    return this.executePaginatedQuery(query, [params.limit, params.offset]);
+    const query = 'SELECT * FROM pay_slips LIMIT ? OFFSET ?';
+    const countQuery = 'SELECT COUNT(*) as total FROM pay_slips';
+    return this.executePaginatedQuery(
+      query,
+      [Number(params.limit), Number(params.offset)],
+      countQuery,
+      [],
+    );
   }
 
   async retrieveByUser(uid: string, params: PaginationParams): Promise<PaginatedResult<IPayslip>> {
-    const query = 'SELECT SQL_CALC_FOUND_ROWS * FROM pay_slips WHERE uid = ? LIMIT ? OFFSET ?';
-    return this.executePaginatedQuery(query, [uid, params.limit, params.offset]);
+    const query = 'SELECT * FROM pay_slips WHERE uid = ? LIMIT ? OFFSET ?';
+    const countQuery = 'SELECT COUNT(*) as total FROM pay_slips WHERE uid = ?';
+    return this.executePaginatedQuery(
+      query,
+      [uid, Number(params.limit), Number(params.offset)],
+      countQuery,
+      [uid],
+    );
   }
 
   retrieveById(id: string | number): Promise<IPayslip> {
