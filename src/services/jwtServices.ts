@@ -1,30 +1,5 @@
 import * as crypto from 'node:crypto';
-
-interface JwtPayload {
-  uid: string;
-}
-
-/**
- * Interface for JSON Web Token (JWT) utility.
- */
-export interface IJwt {
-  /**
-   * Encodes the given payload into a JWT string.
-   *
-   * @param payload - The payload to encode as a JWT.
-   * @returns The JWT string.
-   */
-  encode(payload: JwtPayload): string;
-
-  /**
-   * Decodes a JWT string, returning the original payload if the signature is valid.
-   *
-   * @param token - The JWT string to decode.
-   * @returns The decoded payload as an object.
-   * @throws Error if the token format is invalid or the signature is incorrect.
-   */
-  decode(token: string): JwtPayload;
-}
+import { IJwt, JwtPayload } from '../models/interface';
 
 /**
  * Classe Jwt permettant de gérer la génération et la vérification des JSON Web Tokens (JWT).

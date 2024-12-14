@@ -110,6 +110,24 @@ export interface ICompanyInfo {
 
 export interface ICompanyInfoRowData extends ICompanyInfo, RowDataPacket {}
 
+export enum LogType {
+  PROFILE_UPDATE = 'PROFILE_UPDATE',
+  LEAVE_REQUEST_PENDING = 'LEAVE_REQUEST_PENDING',
+  LEAVE_REQUEST_ACCEPTED = 'LEAVE_REQUEST_ACCEPTED',
+  LEAVE_REQUEST_REFUSED = 'LEAVE_REQUEST_REFUSED',
+  PAYSLIP_AVAILABLE = 'PAYSLIP_AVAILABLE',
+}
+
+export interface LogEntry {
+  log_id: string;
+  uid: string;
+  log_type: LogType;
+  log_message: string;
+  log_date: Date;
+}
+
+export interface LogEntryRowData extends LogEntry, RowDataPacket {}
+
 /**
  * Generic repository interface to provide basic CRUD operations
  * @example
@@ -158,4 +176,30 @@ export interface IRepository<T> {
    * @returns {Promise<number>} - A promise that resolves to the count of deleted records
    */
   deleteAll?(): Promise<number>;
+}
+
+export interface JwtPayload {
+  uid: string;
+}
+
+/**
+ * Interface for JSON Web Token (JWT) utility.
+ */
+export interface IJwt {
+  /**
+   * Encodes the given payload into a JWT string.
+   *
+   * @param payload - The payload to encode as a JWT.
+   * @returns The JWT string.
+   */
+  encode(payload: JwtPayload): string;
+
+  /**
+   * Decodes a JWT string, returning the original payload if the signature is valid.
+   *
+   * @param token - The JWT string to decode.
+   * @returns The decoded payload as an object.
+   * @throws Error if the token format is invalid or the signature is incorrect.
+   */
+  decode(token: string): JwtPayload;
 }
