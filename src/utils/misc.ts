@@ -86,7 +86,7 @@ export const DEFAULT_PAGE = 1;
 export const DEFAULT_LIMIT = 10;
 
 export function getPaginationParams(query: PaginationParams): { limit: number; offset: number } {
-  const page = Math.max(1, query.page || DEFAULT_PAGE);
+  const page = Math.max(1, isNumber(query.page) ? query.page : DEFAULT_PAGE);
   const limit = Math.max(1, Math.min(isNumber(query.limit) ? query.limit : DEFAULT_LIMIT, 100));
   const offset = isNumber(query.offset) ? query.offset : (page - 1) * limit;
 
