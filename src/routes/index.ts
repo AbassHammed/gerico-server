@@ -5,6 +5,7 @@ import cors, { CorsOptions } from 'cors';
 import companyInfoRoutes from './companyInfo';
 import commonRoutes from './common';
 import payslipRoutes from './payslip';
+import userLogRoutes from './userLog';
 import { responseHandler } from '../middlewares/responseHandler';
 
 class Routes {
@@ -14,6 +15,7 @@ class Routes {
     app.use('/api/v1/company', companyInfoRoutes);
     app.use('/api/v1/common', commonRoutes);
     app.use('/api/v1/payslip', payslipRoutes);
+    app.use('/api/v1/logs', userLogRoutes);
   }
 }
 

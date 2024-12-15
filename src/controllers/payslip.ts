@@ -2,11 +2,13 @@
 import { Request, Response } from 'express';
 import { CreatePayslipInput } from '../middlewares/payslip.middleware';
 import { checkAdmin } from './companyInfo';
-import { IPayslip } from '../models/interface';
+import { IPayslip, LogType } from '../models/interface';
 import { generateId, getPaginationParams } from '../utils/misc';
 import payslipRepo from '../repositories/payslip';
 import { logservice } from '../services/loggerService';
 import { ApiResponse } from '../services/ApiResponse';
+import loggingService from '../services/LogService';
+import userLogRepo from '../repositories/userLog';
 
 export class PayslipController {
   async create(req: Request<object, object, CreatePayslipInput>, res: Response) {
@@ -29,6 +31,12 @@ export class PayslipController {
         end_period: endPeriod,
         pay_date: payDate,
       };
+
+      const logEntry = loggingService.createLogEntry(newPayslip.uid, LogType.PAYSLIP_AVAILABLE, {
+        period: `${startPeriod} - ${endPeriod}`,
+      });
+
+      await userLogRepo.save(logEntry);
 
       await payslipRepo.save(newPayslip);
       res.sendResponse(
@@ -69,6 +77,12 @@ export class PayslipController {
         end_period: endPeriod,
         pay_date: payDate,
       };
+
+      const logEntry = loggingService.createLogEntry(newPayslip.uid, LogType.PAYSLIP_AVAILABLE, {
+        period: `${startPeriod} - ${endPeriod}`,
+      });
+
+      await userLogRepo.save(logEntry);
 
       await payslipRepo.update(newPayslip);
       res.sendResponse(

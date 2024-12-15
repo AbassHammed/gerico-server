@@ -57,3 +57,5 @@ export class LoggingService {
     };
   }
 }
+
+export default new LoggingService();
