@@ -134,7 +134,7 @@ export class UsersController {
       await emailService.sendConnectionAlertEmail(user.email, {
         civility: user.civility,
         lastName: user.last_name,
-        loginDate: new Date().toISOString(),
+        loginDate: new Date().toLocaleDateString(),
         operatingSystem: os,
         browser,
       });
