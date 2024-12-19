@@ -6,6 +6,19 @@ export interface PaginationParams {
   offset?: number;
 }
 
+export interface ILeaveRequest {
+  leave_request_id: string;
+  request_status: string;
+  start_date: Date;
+  end_date: Date;
+  created_at: Date;
+  reason?: string;
+  leave_type: string;
+  uid: string;
+}
+
+export interface ILeaveRequestRowData extends ILeaveRequest, RowDataPacket {}
+
 export interface PaginatedResult<T> {
   data: T[];
   pagination: {

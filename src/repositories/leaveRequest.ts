@@ -1,7 +1,18 @@
-import { ILeaveRequest, IRepository } from '../models/interface';
+/* eslint-disable brace-style */
+import {
+  ILeaveRequest,
+  ILeaveRequestRowData,
+  IRepository,
+  PaginatedResult,
+  PaginationParams,
+} from '../models/interface';
 import connection from '../models/connect';
+import { RepositoryEntity } from './entity';
 
-class LeaveRequestRepo implements Omit<IRepository<ILeaveRequest>, 'retrieveAll' | 'deleteAll'> {
+class LeaveRequestRepo
+  extends RepositoryEntity<ILeaveRequest, ILeaveRequestRowData>
+  implements IRepository<ILeaveRequest>
+{
   save(lr: ILeaveRequest): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query(
@@ -27,25 +38,86 @@ class LeaveRequestRepo implements Omit<IRepository<ILeaveRequest>, 'retrieveAll'
     });
   }
 
-  retrieveAll(uid: string): Promise<ILeaveRequest[]> {
+  retrieveAll(params: PaginationParams): Promise<PaginatedResult<ILeaveRequest>> {
+    const query = 'SELECT * FROM leave_requests ORDER BY created_at DESC LIMIT ? OFFSET ?';
+    const countQuery = 'SELECT COUNT(*) as total FROM leave_requests';
+    return this.executePaginatedQuery(
+      query,
+      [Number(params.limit), Number(params.offset)],
+      countQuery,
+      [],
+    );
+  }
+
+  retrieveByUserId(uid: string, params: PaginationParams): Promise<PaginatedResult<ILeaveRequest>> {
+    const query =
+      'SELECT * FROM leave_requests WHERE uid = ? ORDER BY created_at DESC LIMIT ? OFFSET ?';
+    const countQuery = 'SELECT COUNT(*) as total FROM leave_requests WHERE uid = ?';
+    return this.executePaginatedQuery(
+      query,
+      [uid, Number(params.limit), Number(params.offset)],
+      countQuery,
+      [uid],
+    );
+  }
+
+  retrieveByStatus(
+    status: string | undefined,
+    params: PaginationParams,
+  ): Promise<PaginatedResult<ILeaveRequest>> {
+    let query = 'SELECT * FROM leave_requests';
+    let countQuery = 'SELECT COUNT(*) as total FROM leave_requests';
+    const queryParams: (string | number)[] = [];
+    const countQueryParams: (string | number)[] = [];
+
+    if (status) {
+      query += ' WHERE request_status = ?';
+      countQuery += ' WHERE request_status = ?';
+      queryParams.push(status);
+      countQueryParams.push(status);
+    }
+
+    query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
+    queryParams.push(Number(params.limit), Number(params.offset));
+
+    return this.executePaginatedQuery(query, queryParams, countQuery, countQueryParams);
+  }
+
+  updateStatus(t: ILeaveRequest): Promise<true> {
     return new Promise((resolve, reject) => {
-      connection.query<ILeaveRequest[]>(
-        'SELECT * FROM leave_requests WHERE uid = ?',
-        [uid],
-        (err, res) => {
+      connection.query(
+        'UPDATE leave_requests SET request_status = ? WHERE leave_request_id = ?',
+        [t.request_status, t.leave_request_id],
+        err => {
           if (err) {
             reject(err);
           } else {
-            resolve(res);
+            resolve(true);
           }
         },
       );
     });
   }
 
-  deleteAll(uid: string): Promise<true> {
+  update(t: ILeaveRequest): Promise<true> {
     return new Promise((resolve, reject) => {
-      connection.query('DELETE FROM leave_requests WHERE uid = ?', [uid], err => {
+      connection.query(
+        'UPDATE leave_requests SET start_date = ?, end_date = ?, reason = ?, leave_type = ? request_status = ? WHERE leave_request_id = ?',
+        [t.start_date, t.end_date, t.reason, t.leave_type, t.request_status, t.leave_request_id],
+        err => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(true);
+          }
+        },
+      );
+    });
+  }
+
+  delete(id: string | number): Promise<true> {
+    return new Promise((resolve, reject) => {
+      connection.query('DELETE FROM leave_requests WHERE leave_request_id = ?', [id], err => {
         if (err) {
           reject(err);
         } else {
