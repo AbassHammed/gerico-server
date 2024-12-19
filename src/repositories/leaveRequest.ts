@@ -16,7 +16,7 @@ class LeaveRequestRepo
   save(lr: ILeaveRequest): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query(
-        'INSERT INTO leave_requests (leave_request_id, uid, request_status, created_at, start_date, end_date, reason) VALUES(?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO leave_requests (leave_request_id, uid, request_status, created_at, start_date, end_date, reason, leave_type) VALUES(?, ?, ?, ?, ?, ?, ?, ?)',
         [
           lr.leave_request_id,
           lr.uid,
@@ -25,6 +25,7 @@ class LeaveRequestRepo
           lr.start_date,
           lr.end_date,
           lr.reason,
+          lr.leave_type,
         ],
 
         err => {
@@ -47,6 +48,22 @@ class LeaveRequestRepo
       countQuery,
       [],
     );
+  }
+
+  retrieveById(id: string | number): Promise<ILeaveRequest> {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        'SELECT * FROM leave_requests WHERE leave_request_id = ?',
+        [id],
+        (err, res) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(res[0]);
+          }
+        },
+      );
+    });
   }
 
   retrieveByUserId(uid: string, params: PaginationParams): Promise<PaginatedResult<ILeaveRequest>> {

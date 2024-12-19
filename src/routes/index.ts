@@ -7,6 +7,7 @@ import commonRoutes from './common';
 import payslipRoutes from './payslip';
 import userLogRoutes from './userLog';
 import { responseHandler } from '../middlewares/responseHandler';
+import leaveRequestRoutes from './leaveRequest';
 
 class Routes {
   constructor(app: Application) {
@@ -16,6 +17,7 @@ class Routes {
     app.use('/api/v1/common', commonRoutes);
     app.use('/api/v1/payslip', payslipRoutes);
     app.use('/api/v1/logs', userLogRoutes);
+    app.use('/api/v1/leave-requests', leaveRequestRoutes);
   }
 }
 
