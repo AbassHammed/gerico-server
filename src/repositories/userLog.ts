@@ -16,7 +16,7 @@ class UserLogRepository
   save(t: LogEntry): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query(
-        'INSERT INTO user_logs (log_id, uid, log_type, log_message, log_date) VALUES (?, ?, ?, ?, ?)',
+        'INSERT INTO users_logs (log_id, uid, log_type, log_message, log_date) VALUES (?, ?, ?, ?, ?)',
         [t.log_id, t.uid, t.log_type, t.log_message, t.log_date],
         err => {
           if (err) {
@@ -30,8 +30,8 @@ class UserLogRepository
   }
 
   retrieveAll(params: PaginationParams): Promise<PaginatedResult<LogEntry>> {
-    const query = 'SELECT * FROM user_logs ORDER BY log_date DESC LIMIT ? OFFSET ?';
-    const countQuery = 'SELECT COUNT(*) as total FROM user_logs';
+    const query = 'SELECT * FROM users_logs ORDER BY log_date DESC LIMIT ? OFFSET ?';
+    const countQuery = 'SELECT COUNT(*) as total FROM users_logs';
     return this.executePaginatedQuery(
       query,
       [Number(params.limit), Number(params.offset)],
@@ -41,8 +41,8 @@ class UserLogRepository
   }
 
   retrieveByUserId(uid: string, params: PaginationParams): Promise<PaginatedResult<LogEntry>> {
-    const query = 'SELECT * FROM user_logs WHERE uid = ? ORDER BY log_date DESC LIMIT ? OFFSET ?';
-    const countQuery = 'SELECT COUNT(*) as total FROM user_logs WHERE uid = ?';
+    const query = 'SELECT * FROM users_logs WHERE uid = ? ORDER BY log_date DESC LIMIT ? OFFSET ?';
+    const countQuery = 'SELECT COUNT(*) as total FROM users_logs WHERE uid = ?';
     return this.executePaginatedQuery(
       query,
       [uid, Number(params.limit), Number(params.offset)],
