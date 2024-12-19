@@ -27,6 +27,7 @@ class CompanyInfoRouter {
     );
     this.router.delete('/:siret', requireAuth, this.controller.delete);
     this.router.get('/:siret', requireAuth, this.controller.getById);
+    this.router.get('/', requireAuth, this.controller.getCompanyFromUser);
   }
 }
 

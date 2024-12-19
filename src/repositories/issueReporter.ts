@@ -1,8 +1,19 @@
-import { IIssueReporter, IIssueReporterRow, IRepository } from '../models/interface';
+/* eslint-disable brace-style */
+import {
+  IIssueReporter,
+  IIssueReporterRow,
+  IRepository,
+  PaginatedResult,
+  PaginationParams,
+} from '../models/interface';
 import connection from '../models/connect';
 import { ResultSetHeader } from 'mysql2';
+import { RepositoryEntity } from './entity';
 
-class IssueReporterRepository implements IRepository<IIssueReporter> {
+class IssueReporterRepository
+  extends RepositoryEntity<IIssueReporter, IIssueReporterRow>
+  implements IRepository<IIssueReporter>
+{
   save(t: IIssueReporter): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query<ResultSetHeader>(
@@ -19,16 +30,15 @@ class IssueReporterRepository implements IRepository<IIssueReporter> {
     });
   }
 
-  retrieveAll(): Promise<IIssueReporter[]> {
-    return new Promise((resolve, reject) => {
-      connection.query<IIssueReporterRow[]>('SELECT * FROM issue_reports', (err, res) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(res);
-        }
-      });
-    });
+  retrieveAll(params: PaginationParams): Promise<PaginatedResult<IIssueReporter>> {
+    const query = 'SELECT * FROM issue_reports LIMIT ? OFFSET ?';
+    const countQuery = 'SELECT COUNT(*) as total FROM issue_reports';
+    return this.executePaginatedQuery(
+      query,
+      [Number(params.limit), Number(params.offset)],
+      countQuery,
+      [],
+    );
   }
 
   retrieveById(id: string | number): Promise<IIssueReporter> {
@@ -63,19 +73,15 @@ class IssueReporterRepository implements IRepository<IIssueReporter> {
     });
   }
 
-  retrieveNotSolved(): Promise<IIssueReporter[]> {
-    return new Promise((resolve, reject) => {
-      connection.query<IIssueReporterRow[]>(
-        'SELECT * FROM issue_reports WHERE solved = false',
-        (err, res) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(res);
-          }
-        },
-      );
-    });
+  retrieveNotSolved(params: PaginationParams): Promise<PaginatedResult<IIssueReporter>> {
+    const query = 'SELECT * FROM issue_reports WHERE solved = false LIMIT ? OFFSET ?';
+    const countQuery = 'SELECT COUNT(*) as total FROM issue_reports WHERE solved = false';
+    return this.executePaginatedQuery(
+      query,
+      [Number(params.limit), Number(params.offset)],
+      countQuery,
+      [],
+    );
   }
 }
 

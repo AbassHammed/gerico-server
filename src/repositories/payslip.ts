@@ -1,7 +1,18 @@
-import { IPayslip, IPayslipRow, IRepository } from '../models/interface';
+/* eslint-disable brace-style */
+import {
+  IPayslip,
+  IPayslipRow,
+  IRepository,
+  PaginatedResult,
+  PaginationParams,
+} from '../models/interface';
 import connection from '../models/connect';
+import { RepositoryEntity } from './entity';
 
-class PayslipRepository implements IRepository<IPayslip> {
+class PayslipRepository
+  extends RepositoryEntity<IPayslip, IPayslipRow>
+  implements IRepository<IPayslip>
+{
   save(t: IPayslip): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query(
@@ -29,6 +40,28 @@ class PayslipRepository implements IRepository<IPayslip> {
     });
   }
 
+  async retrieveAll(params: PaginationParams): Promise<PaginatedResult<IPayslip>> {
+    const query = 'SELECT * FROM pay_slips LIMIT ? OFFSET ?';
+    const countQuery = 'SELECT COUNT(*) as total FROM pay_slips';
+    return this.executePaginatedQuery(
+      query,
+      [Number(params.limit), Number(params.offset)],
+      countQuery,
+      [],
+    );
+  }
+
+  async retrieveByUser(uid: string, params: PaginationParams): Promise<PaginatedResult<IPayslip>> {
+    const query = 'SELECT * FROM pay_slips WHERE uid = ? LIMIT ? OFFSET ?';
+    const countQuery = 'SELECT COUNT(*) as total FROM pay_slips WHERE uid = ?';
+    return this.executePaginatedQuery(
+      query,
+      [uid, Number(params.limit), Number(params.offset)],
+      countQuery,
+      [uid],
+    );
+  }
+
   retrieveById(id: string | number): Promise<IPayslip> {
     return new Promise((resolve, reject) => {
       connection.query<IPayslipRow[]>('SELECT * FROM pay_slips WHERE pid = ?', [id], (err, res) => {
@@ -38,34 +71,6 @@ class PayslipRepository implements IRepository<IPayslip> {
           resolve(res?.[0]);
         }
       });
-    });
-  }
-
-  retrieveAll(): Promise<IPayslip[]> {
-    return new Promise((resolve, reject) => {
-      connection.query<IPayslipRow[]>('SELECT * FROM pay_slips', (err, res) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(res);
-        }
-      });
-    });
-  }
-
-  retrieveByUser(uid: string): Promise<IPayslip[]> {
-    return new Promise((resolve, reject) => {
-      connection.query<IPayslipRow[]>(
-        'SELECT * FROM pay_slips WHERE uid = ?',
-        [uid],
-        (err, res) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(res);
-          }
-        },
-      );
     });
   }
 

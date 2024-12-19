@@ -12,6 +12,7 @@ class CommonRouter {
 
   initRouter() {
     this.router.get('/thresholds', requireAuth, this.controller.retrieveThresholds);
+    this.router.get('/deductions', requireAuth, this.controller.retrieveDeductions);
   }
 }
 
