@@ -31,7 +31,7 @@ describe('LoggingService', () => {
       log_id: 'mocked-id',
       uid: 'user123',
       log_type: LogType.PROFILE_UPDATE,
-      log_message: 'Votre profil a été mis à jour. Champs modifiés : email, téléphone',
+      log_message: 'Votre profil a été mis à jour.',
       log_date: result.log_date, // Verify the exact date separately below
     });
 

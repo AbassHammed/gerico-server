@@ -11,7 +11,7 @@ type LogParamsMap = {
 
 type DefaultParams = Record<string, string>;
 
-class LoggingService {
+export class LoggingService {
   private logTemplates = {
     [LogType.PROFILE_UPDATE]: () => `Votre profil a été mis à jour.`,
     [LogType.LEAVE_REQUEST_PENDING]: ({

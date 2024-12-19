@@ -1,0 +1,12 @@
+# Exclude dotfiles and directories
+.github
+.husky
+.vscode
+.*
+
+# Exclude the tests directory
+tests
+
+# Exclude any other unnecessary files or directories
+Dockerfile
+.dockerignore
