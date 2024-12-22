@@ -2,7 +2,10 @@ import { Router } from 'express';
 import validateResource from '../middlewares/route-verif';
 import { requireAuth } from '../middlewares/protected-route';
 import { LeaveRequestController } from '../controllers/leaveRequest';
-import { LeaveRequestBodySchema } from '../middlewares/leaveRequest.middleware';
+import {
+  LeaveRequestBodySchema,
+  UpdateLeaveRequestBodyschema,
+} from '../middlewares/leaveRequest.middleware';
 
 class LeaveRequestRouter {
   router = Router();
@@ -13,10 +16,22 @@ class LeaveRequestRouter {
   }
 
   initRouter() {
-    this.router.post('/', validateResource(LeaveRequestBodySchema), this.controller.create);
-    this.router.get('/', requireAuth, this.controller.getAll);
+    this.router.post(
+      '/',
+      requireAuth,
+      validateResource(LeaveRequestBodySchema),
+      this.controller.create,
+    );
     this.router.get('/status', requireAuth, this.controller.getAllByStatus);
-    this.router.get('/:lid', requireAuth, this.controller.getMyRequests);
+    this.router.get('/me', requireAuth, this.controller.getMyRequests);
+    this.router.get('/:lid', requireAuth, this.controller.getById);
+    this.router.get('/', requireAuth, this.controller.getAll);
+    this.router.patch(
+      '/:lid',
+      requireAuth,
+      validateResource(UpdateLeaveRequestBodyschema),
+      this.controller.update,
+    );
   }
 }
 

@@ -66,16 +66,27 @@ class LeaveRequestRepo
     });
   }
 
-  retrieveByUserId(uid: string, params: PaginationParams): Promise<PaginatedResult<ILeaveRequest>> {
-    const query =
-      'SELECT * FROM leave_requests WHERE uid = ? ORDER BY created_at DESC LIMIT ? OFFSET ?';
-    const countQuery = 'SELECT COUNT(*) as total FROM leave_requests WHERE uid = ?';
-    return this.executePaginatedQuery(
-      query,
-      [uid, Number(params.limit), Number(params.offset)],
-      countQuery,
-      [uid],
-    );
+  retrieveByUserId(
+    uid: string,
+    params: PaginationParams,
+    status?: string,
+  ): Promise<PaginatedResult<ILeaveRequest>> {
+    let query = 'SELECT * FROM leave_requests WHERE uid = ?';
+    let countQuery = 'SELECT COUNT(*) as total FROM leave_requests WHERE uid = ?';
+    const queryParams: (string | number)[] = [uid];
+    const countQueryParams: (string | number)[] = [uid];
+
+    if (status) {
+      query += ' AND request_status = ?';
+      countQuery += ' AND request_status = ?';
+      queryParams.push(String(status));
+      countQueryParams.push(String(status));
+    }
+
+    query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
+    queryParams.push(Number(params.limit), Number(params.offset));
+
+    return this.executePaginatedQuery(query, queryParams, countQuery, countQueryParams);
   }
 
   retrieveByStatus(

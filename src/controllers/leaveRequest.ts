@@ -3,7 +3,10 @@ import { ApiResponse } from '../services/ApiResponse';
 import { logservice } from '../services/loggerService';
 import { checkAdmin } from './companyInfo';
 import LeaveRequestRepo from '../repositories/leaveRequest';
-import { LeaveRequestBodyType } from '../middlewares/leaveRequest.middleware';
+import {
+  LeaveRequestBodyType,
+  UpdateLeaveRequestBodyType,
+} from '../middlewares/leaveRequest.middleware';
 import { ILeaveRequest, LogType } from '../models/interface';
 import { generateId, getPaginationParams } from '../utils/misc';
 import loggingService from '../services/LogService';
@@ -55,9 +58,14 @@ export class LeaveRequestController {
 
   async getMyRequests(req: Request, res: Response) {
     try {
+      const { status } = req.query as { status: string };
       const paginatedParams = getPaginationParams(req.query);
       const { uid } = req.user;
-      const leaveRequests = await LeaveRequestRepo.retrieveByUserId(uid.trim(), paginatedParams);
+      const leaveRequests = await LeaveRequestRepo.retrieveByUserId(
+        uid.trim(),
+        paginatedParams,
+        status,
+      );
       return res.sendResponse(ApiResponse.success(200, leaveRequests));
     } catch (error) {
       logservice.error('[getMyRequests$LeaveRequestController]', error);
@@ -116,6 +124,42 @@ export class LeaveRequestController {
       );
     } catch (error) {
       logservice.error('[updateStatus$LeaveRequestController]', error);
+      return res.sendResponse(ApiResponse.error(500, error.message));
+    }
+  }
+
+  async update(req: Request<object, object, UpdateLeaveRequestBodyType>, res: Response) {
+    try {
+      const start_date = new Date(req.body.start_date);
+      const end_date = new Date(req.body.end_date);
+      const created_at = new Date(req.body.created_at);
+
+      const leaveRequest: ILeaveRequest = {
+        ...req.body,
+        start_date,
+        end_date,
+        created_at,
+      };
+
+      await LeaveRequestRepo.update(leaveRequest);
+      return res.sendResponse(
+        ApiResponse.success(200, undefined, 'La demande de congé a été mise à jour avec succès'),
+      );
+    } catch (error) {
+      logservice.error('[update$LeaveRequestController]', error);
+      return res.sendResponse(ApiResponse.error(500, error.message));
+    }
+  }
+
+  async deleteOne(req: Request, res: Response) {
+    try {
+      const { lid } = req.params;
+      await LeaveRequestRepo.delete(lid.trim());
+      return res.sendResponse(
+        ApiResponse.success(200, undefined, 'La demande de congé a été supprimée avec succès'),
+      );
+    } catch (error) {
+      logservice.error('[deleteOne$LeaveRequestController]', error);
       return res.sendResponse(ApiResponse.error(500, error.message));
     }
   }
