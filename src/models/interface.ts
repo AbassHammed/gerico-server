@@ -137,6 +137,7 @@ export interface LogEntry {
   log_type: LogType;
   log_message: string;
   log_date: Date;
+  is_read: boolean;
 }
 
 export interface LogEntryRowData extends LogEntry, RowDataPacket {}

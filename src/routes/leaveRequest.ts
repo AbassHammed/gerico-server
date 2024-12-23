@@ -32,6 +32,7 @@ class LeaveRequestRouter {
       validateResource(UpdateLeaveRequestBodyschema),
       this.controller.update,
     );
+    this.router.delete('/:lid', requireAuth, this.controller.deleteOne);
   }
 }
 

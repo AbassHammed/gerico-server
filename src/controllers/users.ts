@@ -111,7 +111,7 @@ export class UsersController {
 
   async login(req: Request<object, object, LoginInput>, res: Response) {
     try {
-      const { email, password, os, browser } = req.body;
+      const { email, password } = req.body;
 
       const user = await usersRepo.retrieveByEmail(email);
 
@@ -131,13 +131,13 @@ export class UsersController {
 
       const token = jwtServices.encode({ uid: user.uid });
 
-      await emailService.sendConnectionAlertEmail(user.email, {
-        civility: user.civility,
-        lastName: user.last_name,
-        loginDate: new Date().toLocaleDateString(),
-        operatingSystem: os,
-        browser,
-      });
+      // await emailService.sendConnectionAlertEmail(user.email, {
+      //   civility: user.civility,
+      //   lastName: user.last_name,
+      //   loginDate: new Date().toLocaleDateString(),
+      //   operatingSystem: os,
+      //   browser,
+      // });
 
       let response: LoginResponse = {
         code: 'DEFAULTPASS',
@@ -499,10 +499,11 @@ export class UsersController {
 
       const response = {
         sent: true,
-        message: "L'e-mail a été envoyé avec succès.",
       };
 
-      return res.sendResponse(ApiResponse.success(200, response));
+      return res.sendResponse(
+        ApiResponse.success(200, response, "L'e-mail a été envoyé avec succès."),
+      );
     } catch (error) {
       logservice.error('[resendWelcomeEmail$UsersController]', error);
       return res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur.'));
@@ -537,9 +538,10 @@ export class UsersController {
 
       const response = {
         result: true,
-        message: "L'utilisateur a été archivé avec succès.",
       };
-      return res.sendResponse(ApiResponse.success(200, response));
+      return res.sendResponse(
+        ApiResponse.success(200, response, "L'utilisateur a été archivé avec succès."),
+      );
     } catch (error) {
       logservice.error('[archiveUser$UsersController]', error);
       return res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur.'));

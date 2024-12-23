@@ -54,6 +54,7 @@ export class LoggingService {
       log_type: logType,
       log_message: this.generateLogMessage(logType, params),
       log_date: new Date(),
+      is_read: false,
     };
   }
 }
