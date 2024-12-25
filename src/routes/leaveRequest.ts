@@ -24,6 +24,8 @@ class LeaveRequestRouter {
     );
     this.router.get('/status', requireAuth, this.controller.getAllByStatus);
     this.router.get('/me', requireAuth, this.controller.getMyRequests);
+    this.router.get('/upcoming', requireAuth, this.controller.getAllUpcoming);
+    this.router.get('/upcoming/:uid', requireAuth, this.controller.getAcceptedRequestsForUser);
     this.router.get('/:lid', requireAuth, this.controller.getById);
     this.router.get('/', requireAuth, this.controller.getAll);
     this.router.patch(

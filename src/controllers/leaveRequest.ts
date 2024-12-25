@@ -56,6 +56,16 @@ export class LeaveRequestController {
     }
   }
 
+  async getAllUpcoming(req: Request, res: Response) {
+    try {
+      const leaveRequests = await LeaveRequestRepo.retrieveAllUpcoming();
+      return res.sendResponse(ApiResponse.success(200, leaveRequests));
+    } catch (error) {
+      logservice.error('[getAllUpcoming$LeaveRequestController]', error);
+      return res.sendResponse(ApiResponse.error(500, error.message));
+    }
+  }
+
   async getMyRequests(req: Request, res: Response) {
     try {
       const { status } = req.query as { status: string };
@@ -69,6 +79,17 @@ export class LeaveRequestController {
       return res.sendResponse(ApiResponse.success(200, leaveRequests));
     } catch (error) {
       logservice.error('[getMyRequests$LeaveRequestController]', error);
+      return res.sendResponse(ApiResponse.error(500, error.message));
+    }
+  }
+
+  async getAcceptedRequestsForUser(req: Request, res: Response) {
+    try {
+      const { uid } = req.params;
+      const leaveRequests = await LeaveRequestRepo.retrieveUpcomingByUserId(uid.trim());
+      return res.sendResponse(ApiResponse.success(200, leaveRequests));
+    } catch (error) {
+      logservice.error('[getAcceptedRequestsForUser$LeaveRequestController]', error);
       return res.sendResponse(ApiResponse.error(500, error.message));
     }
   }

@@ -89,6 +89,37 @@ class LeaveRequestRepo
     return this.executePaginatedQuery(query, queryParams, countQuery, countQueryParams);
   }
 
+  retrieveUpcomingByUserId(uid: string): Promise<ILeaveRequest[]> {
+    const query =
+      'SELECT * FROM leave_requests WHERE uid = ? AND end_date > NOW() AND request_status = ?';
+    const queryParams: (string | number)[] = [uid, 'approved'];
+
+    return new Promise((resolve, reject) => {
+      connection.query<ILeaveRequestRowData[]>(query, queryParams, (err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res);
+        }
+      });
+    });
+  }
+
+  retrieveAllUpcoming(): Promise<ILeaveRequest[]> {
+    const query = 'SELECT * FROM leave_requests WHERE end_date > NOW() AND request_status = ?';
+    const queryParams: (string | number)[] = ['approved'];
+
+    return new Promise((resolve, reject) => {
+      connection.query<ILeaveRequestRowData[]>(query, queryParams, (err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res);
+        }
+      });
+    });
+  }
+
   retrieveByStatus(
     status: string | undefined,
     params: PaginationParams,
