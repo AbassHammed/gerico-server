@@ -161,7 +161,7 @@ class LeaveRequestRepo
   update(t: ILeaveRequest): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query(
-        'UPDATE leave_requests SET start_date = ?, end_date = ?, reason = ?, leave_type = ? request_status = ? WHERE leave_request_id = ?',
+        'UPDATE leave_requests SET start_date = ?, end_date = ?, reason = ?, leave_type = ?, request_status = ? WHERE leave_request_id = ?',
         [t.start_date, t.end_date, t.reason, t.leave_type, t.request_status, t.leave_request_id],
         err => {
           if (err) {
