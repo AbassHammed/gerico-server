@@ -70,6 +70,21 @@ class UserRepository
     );
   }
 
+  retrieveAllNotArchived(): Promise<IUser[]> {
+    return new Promise((resolve, reject) => {
+      connection.query<IUserRowData[]>(
+        'SELECT * FROM users WHERE is_archived = false',
+        (err, res) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(res);
+          }
+        },
+      );
+    });
+  }
+
   retrieveById(id: string | number): Promise<IUser> {
     return new Promise((resolve, reject) => {
       connection.query<IUserRowData[]>('SELECT * FROM users WHERE uid = ?', [id], (err, res) => {

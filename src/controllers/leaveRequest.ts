@@ -11,6 +11,8 @@ import { ILeaveRequest, LogType } from '../models/interface';
 import { generateId, getPaginationParams } from '../utils/misc';
 import loggingService from '../services/LogService';
 import userLog from '../repositories/userLog';
+import emailService from '../services/mail/mailServices';
+import usersRepo from '../repositories/users';
 
 export class LeaveRequestController {
   async create(req: Request<object, object, LeaveRequestBodyType>, res: Response) {
@@ -31,11 +33,31 @@ export class LeaveRequestController {
         leaveRequest.uid,
         LogType.LEAVE_REQUEST_PENDING,
         {
-          startDate: leaveRequest.start_date.toLocaleDateString(),
-          endDate: leaveRequest.end_date.toLocaleDateString(),
+          startDate: leaveRequest.start_date.toLocaleString(),
+          endDate: leaveRequest.end_date.toLocaleString(),
         },
       );
       await userLog.save(logEntry);
+      const user = await usersRepo.retrieveById(leaveRequest.uid);
+
+      if (!user) {
+        return res.sendResponse(
+          ApiResponse.error(
+            404,
+            `Nous n'avons pas pu trouver l'utilisateur associé à cette demande`,
+          ),
+        );
+      }
+
+      await emailService.sendLeaveRequestPendingEmail(user.email, {
+        civility: user.civility,
+        lastName: user.last_name,
+        leaveType: leaveRequest.leave_type,
+        startDate: leaveRequest.start_date.toLocaleString(),
+        endDate: leaveRequest.end_date.toLocaleString(),
+        reason: leaveRequest.reason ?? 'Aucune raison spécifiée',
+      });
+
       return res.sendResponse(
         ApiResponse.success(200, undefined, 'Votre demande de congé a été ajoutée avec succès'),
       );
@@ -163,6 +185,27 @@ export class LeaveRequestController {
       };
 
       await LeaveRequestRepo.update(leaveRequest);
+      const user = await usersRepo.retrieveById(leaveRequest.uid);
+
+      if (!user) {
+        return res.sendResponse(
+          ApiResponse.error(
+            404,
+            `Nous n'avons pas pu trouver l'utilisateur associé à cette demande`,
+          ),
+        );
+      }
+
+      await emailService.sendLeaveRequestResponseEmail(user.email, {
+        civility: user.civility,
+        lastName: user.last_name,
+        statusColor: leaveRequest.request_status === 'approved' ? 'green' : 'red',
+        status: leaveRequest.request_status === 'approved' ? 'acceptée' : 'refusée',
+        leaveType: leaveRequest.leave_type,
+        startDate: leaveRequest.start_date.toLocaleString(),
+        endDate: leaveRequest.end_date.toLocaleString(),
+        reason: leaveRequest.reason ?? 'Aucune raison spécifiée',
+      });
       return res.sendResponse(
         ApiResponse.success(200, undefined, 'La demande de congé a été mise à jour avec succès'),
       );
@@ -181,6 +224,34 @@ export class LeaveRequestController {
       );
     } catch (error) {
       logservice.error('[deleteOne$LeaveRequestController]', error);
+      return res.sendResponse(ApiResponse.error(500, error.message));
+    }
+  }
+
+  async leaveRequestReminder(req: Request, res: Response) {
+    try {
+      const users = await usersRepo.retrieveAllNotArchived();
+
+      for (const user of users) {
+        if (user.remaining_leave_balance <= 0) {
+          continue;
+        }
+
+        const currentYear = new Date().getFullYear();
+        const deadlineDate = new Date(currentYear, 9, 31);
+        await emailService.sendReminderEmail(user.email, {
+          civility: user.civility,
+          lastName: user.last_name,
+          deadlineDate: deadlineDate.toLocaleString(),
+          daysLeft: user.remaining_leave_balance.toString(),
+        });
+      }
+
+      return res.sendResponse(
+        ApiResponse.success(200, undefined, 'Un email de rappel a été envoyé avec succès'),
+      );
+    } catch (error) {
+      logservice.error('[leaveRequestReminder$LeaveRequestController]', error);
       return res.sendResponse(ApiResponse.error(500, error.message));
     }
   }

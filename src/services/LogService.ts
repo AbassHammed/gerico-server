@@ -7,13 +7,17 @@ type LogParamsMap = {
   [LogType.LEAVE_REQUEST_ACCEPTED]: { startDate: string; endDate: string };
   [LogType.LEAVE_REQUEST_REFUSED]: { startDate: string; endDate: string; reason: string };
   [LogType.PAYSLIP_AVAILABLE]: { period: string };
+  [LogType.ACCOUNT_CREATED];
+  [LogType.LOGIN_ALERT];
 };
 
 type DefaultParams = Record<string, string>;
 
 export class LoggingService {
   private logTemplates = {
+    [LogType.LOGIN_ALERT]: () => `Une connexion a été effectuée sur votre compte.`,
     [LogType.PROFILE_UPDATE]: () => `Votre profil a été mis à jour.`,
+    [LogType.ACCOUNT_CREATED]: () => `Votre compte a été créé avec succès.`,
     [LogType.LEAVE_REQUEST_PENDING]: ({
       startDate,
       endDate,

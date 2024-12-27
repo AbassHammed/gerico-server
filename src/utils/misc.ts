@@ -95,3 +95,7 @@ export function getPaginationParams(query: PaginationParams): { limit: number; o
 
   return { limit, offset };
 }
+
+export function generateRandomCode(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}

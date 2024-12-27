@@ -1,0 +1,37 @@
+<html>
+  <head>
+    <style>
+      body { font-family: Arial, sans-serif; color: #333; background-color: #f4f4f4; }
+      .email-container { max-width: 600px; margin: 20px auto; background: white; border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); } .header { background-color: #f39c12; color:
+      white; padding: 20px; text-align: center; font-size: 24px; } .content { padding: 20px; color:
+      #555; line-height: 1.6; } .info-box { background-color: #f4f4f4; padding: 10px; border-radius:
+      5px; margin-top: 15px; } .footer { background-color: #f4f4f4; color: #666; padding: 10px;
+      text-align: center; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <div class='email-container'>
+      <div class='header'>Rappel : Dépôt de votre demande de congé</div>
+      <div class='content'>
+        <p>Bonjour {{civility}} {{lastName}},</p>
+        <p>
+          Nous vous rappelons que vous avez jusqu'à
+          <strong>{{deadlineDate}}</strong>
+          pour soumettre votre demande de congé. À ce jour, il vous reste
+          <strong>{{daysLeft}} jours</strong>
+          pour finaliser votre dépôt.
+        </p>
+        <p>
+          Veuillez vous connecter au système dès que possible pour enregistrer votre demande. Si
+          vous avez déjà soumis une demande, merci d'ignorer ce message.
+        </p>
+        <p>
+          Pour toute question ou assistance, n'hésitez pas à contacter votre responsable ou le
+          service des ressources humaines.
+        </p>
+      </div>
+      <div class='footer'>© 2024 Gérico. Tous droits réservés.</div>
+    </div>
+  </body>
+</html>

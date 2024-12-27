@@ -9,6 +9,8 @@ import { logservice } from '../services/loggerService';
 import { ApiResponse } from '../services/ApiResponse';
 import loggingService from '../services/LogService';
 import userLogRepo from '../repositories/userLog';
+import emailService from '../services/mail/mailServices';
+import usersRepo from '../repositories/users';
 
 export class PayslipController {
   async create(req: Request<object, object, CreatePayslipInput>, res: Response) {
@@ -39,6 +41,25 @@ export class PayslipController {
       await userLogRepo.save(logEntry);
 
       await payslipRepo.save(newPayslip);
+
+      const user = await usersRepo.retrieveById(newPayslip.uid);
+
+      if (!user) {
+        return res.sendResponse(
+          ApiResponse.error(
+            404,
+            `Nous n'avons pas pu trouver l'utilisateur associé à cette fiche de paie`,
+          ),
+        );
+      }
+      await emailService.sendPayslipAvailableEmail(user.email, {
+        civility: user.civility,
+        lastName: user.last_name,
+        payPeriod: `${startPeriod.toLocaleDateString()} - ${endPeriod.toLocaleDateString()}`,
+        depositDate: payDate.toLocaleDateString(),
+        documentLink: newPayslip.path_to_pdf,
+      });
+
       res.sendResponse(
         ApiResponse.success(200, undefined, 'La fiche de paie est bien enregistré.'),
       );

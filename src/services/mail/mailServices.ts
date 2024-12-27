@@ -1,19 +1,9 @@
-import nodemailer, { Transporter } from 'nodemailer';
 import Queue from 'better-queue';
 import Handlebars from 'handlebars';
 import fs from 'fs/promises';
 import path from 'path';
 import { logservice } from '../loggerService';
-
-interface EmailConfig {
-  host: string;
-  port: number;
-  secure: boolean;
-  auth: {
-    user: string;
-    pass: string;
-  };
-}
+import { Resend } from 'resend';
 
 interface EmailOptions {
   to: string;
@@ -23,11 +13,11 @@ interface EmailOptions {
 }
 
 class EmailService {
-  private transporter: Transporter;
   private queue: Queue;
+  private resend: Resend;
 
-  constructor(config: EmailConfig) {
-    this.transporter = nodemailer.createTransport(config);
+  constructor() {
+    this.resend = new Resend(process.env.RESEND_API_KEY);
     this.queue = new Queue(
       async (task: EmailOptions, cb) => {
         try {
@@ -48,8 +38,8 @@ class EmailService {
   private async processEmail(options: EmailOptions): Promise<void> {
     try {
       const html = await this.renderTemplate(options.template, options.context);
-      await this.transporter.sendMail({
-        from: '"Ressources Humaines Gerico" <abasshammedola@gmail.com>',
+      await this.resend.emails.send({
+        from: 'Gerico Transport <noreply@gericotransport.fr>',
         to: options.to,
         subject: options.subject,
         html,
@@ -106,6 +96,81 @@ class EmailService {
     });
   }
 
+  public async sendLeaveRequestPendingEmail(
+    to: string,
+    context: {
+      civility: string;
+      lastName: string;
+      leaveType: string;
+      startDate: string;
+      endDate: string;
+      reason: string;
+    },
+  ): Promise<void> {
+    await this.queueEmail({
+      to,
+      subject: 'Demande de congé soumise',
+      template: 'leave_pending',
+      context,
+    });
+  }
+
+  public async sendLeaveRequestResponseEmail(
+    to: string,
+    context: {
+      civility: string;
+      lastName: string;
+      statusColor: 'green' | 'red';
+      status: 'acceptée' | 'refusée';
+      leaveType: string;
+      startDate: string;
+      endDate: string;
+      reason?: string;
+    },
+  ): Promise<void> {
+    await this.queueEmail({
+      to,
+      subject: 'Demande de congé traitée',
+      template: 'leave_result',
+      context,
+    });
+  }
+
+  public async sendReminderEmail(
+    to: string,
+    context: {
+      civility: string;
+      lastName: string;
+      deadlineDate: string;
+      daysLeft: string;
+    },
+  ): Promise<void> {
+    await this.queueEmail({
+      to,
+      subject: 'Rappel de congé',
+      template: 'leave_remin',
+      context,
+    });
+  }
+
+  public async sendPayslipAvailableEmail(
+    to: string,
+    context: {
+      civility: string;
+      lastName: string;
+      payPeriod: string;
+      depositDate: string;
+      documentLink: string;
+    },
+  ): Promise<void> {
+    await this.queueEmail({
+      to,
+      subject: 'Bulletin de paie disponible',
+      template: 'payslip',
+      context,
+    });
+  }
+
   public async sendConnectionAlertEmail(
     to: string,
     context: {
@@ -125,12 +190,4 @@ class EmailService {
   }
 }
 
-export default new EmailService({
-  host: process.env.MAIL_HOST as string,
-  port: Number(process.env.MAIL_PORT),
-  secure: process.env.MAIL_SECURE === 'true',
-  auth: {
-    user: process.env.MAIL_USER as string,
-    pass: process.env.MAIL_PASS as string,
-  },
-});
+export default new EmailService();

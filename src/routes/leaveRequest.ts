@@ -22,6 +22,7 @@ class LeaveRequestRouter {
       validateResource(LeaveRequestBodySchema),
       this.controller.create,
     );
+    this.router.post('/reminder', requireAuth, this.controller.leaveRequestReminder);
     this.router.get('/status', requireAuth, this.controller.getAllByStatus);
     this.router.get('/me', requireAuth, this.controller.getMyRequests);
     this.router.get('/upcoming', requireAuth, this.controller.getAllUpcoming);

@@ -11,16 +11,14 @@ import {
 import usersRepo from '../repositories/users';
 import bcryptjs from 'bcryptjs';
 import passwordManager from '../services/passwordManager';
-import { IUser } from '../models/interface';
-import { generateId, getPaginationParams } from '../utils/misc';
+import { IUser, LogType } from '../models/interface';
+import { generateId, generateRandomCode, getPaginationParams } from '../utils/misc';
 import { logservice } from '../services/loggerService';
 import jwtServices from '../services/jwtServices';
 import emailService from '../services/mail/mailServices';
 import { ApiResponse } from '../services/ApiResponse';
-
-function generateRandomCode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
+import loggingService from '../services/LogService';
+import userLog from '../repositories/userLog';
 
 interface LoginResponse {
   token: string;
@@ -100,6 +98,9 @@ export class UsersController {
         defaultPass: password,
       });
 
+      const log = loggingService.createLogEntry(newEmployee.uid, LogType.ACCOUNT_CREATED, {});
+      await userLog.save(log);
+
       return res.sendResponse(
         ApiResponse.success(201, undefined, "L'employé a été créé avec succès."),
       );
@@ -111,7 +112,7 @@ export class UsersController {
 
   async login(req: Request<object, object, LoginInput>, res: Response) {
     try {
-      const { email, password } = req.body;
+      const { email, password, browser, os } = req.body;
 
       const user = await usersRepo.retrieveByEmail(email);
 
@@ -127,17 +128,21 @@ export class UsersController {
         return res.sendResponse(ApiResponse.error(400, 'Mot de passe incorrect.'));
       }
 
+      if (user.is_archived) {
+        return res.sendResponse(ApiResponse.error(400, 'Votre compte a été archivé.'));
+      }
+
       const isdefaultPassword = passwordManager.isDefaultPattern(password);
 
       const token = jwtServices.encode({ uid: user.uid });
 
-      // await emailService.sendConnectionAlertEmail(user.email, {
-      //   civility: user.civility,
-      //   lastName: user.last_name,
-      //   loginDate: new Date().toLocaleDateString(),
-      //   operatingSystem: os,
-      //   browser,
-      // });
+      await emailService.sendConnectionAlertEmail(user.email, {
+        civility: user.civility,
+        lastName: user.last_name,
+        loginDate: new Date().toLocaleString(),
+        operatingSystem: os,
+        browser,
+      });
 
       let response: LoginResponse = {
         code: 'DEFAULTPASS',
@@ -154,6 +159,8 @@ export class UsersController {
         token,
         user,
       };
+      const log = loggingService.createLogEntry(user.uid, LogType.LOGIN_ALERT, {});
+      await userLog.save(log);
 
       return res.sendResponse(ApiResponse.success(200, response));
     } catch (error) {
@@ -357,6 +364,9 @@ export class UsersController {
           ApiResponse.error(400, "Le profil de l'utilisateur n'a pas pu être mis à jour."),
         );
       }
+
+      const log = loggingService.createLogEntry(user.uid, LogType.PROFILE_UPDATE, {});
+      await userLog.save(log);
 
       return res.sendResponse(
         ApiResponse.success(200, undefined, 'Profil mis à jour avec succès.'),
