@@ -13,17 +13,20 @@ import loggingService from '../services/LogService';
 import userLog from '../repositories/userLog';
 import emailService from '../services/mail/mailServices';
 import usersRepo from '../repositories/users';
+import { DateTime } from 'luxon';
 
 export class LeaveRequestController {
   async create(req: Request<object, object, LeaveRequestBodyType>, res: Response) {
     try {
-      const start_date = new Date(req.body.start_date);
-      const end_date = new Date(req.body.end_date);
+      const start_date = DateTime.fromISO(req.body.start_date, { zone: 'utc' }).setZone(
+        'Europe/Paris',
+      );
+      const end_date = DateTime.fromISO(req.body.end_date, { zone: 'utc' }).setZone('Europe/Paris');
 
       const leaveRequest: ILeaveRequest = {
         ...req.body,
-        start_date,
-        end_date,
+        start_date: start_date.toJSDate(),
+        end_date: end_date.toJSDate(),
         leave_request_id: generateId(),
         created_at: new Date(),
       };
@@ -33,8 +36,8 @@ export class LeaveRequestController {
         leaveRequest.uid,
         LogType.LEAVE_REQUEST_PENDING,
         {
-          startDate: leaveRequest.start_date.toLocaleString(),
-          endDate: leaveRequest.end_date.toLocaleString(),
+          startDate: start_date.toFormat('dd MMMM yyyy, HH:mm:ss', { locale: 'fr' }),
+          endDate: end_date.toFormat('dd MMMM yyyy, HH:mm:ss', { locale: 'fr' }),
         },
       );
       await userLog.save(logEntry);
@@ -53,8 +56,8 @@ export class LeaveRequestController {
         civility: user.civility,
         lastName: user.last_name,
         leaveType: leaveRequest.leave_type,
-        startDate: leaveRequest.start_date.toLocaleString(),
-        endDate: leaveRequest.end_date.toLocaleString(),
+        startDate: start_date.toFormat('dd MMMM yyyy, HH:mm:ss', { locale: 'fr' }),
+        endDate: end_date.toFormat('dd MMMM yyyy, HH:mm:ss', { locale: 'fr' }),
         reason: leaveRequest.reason ?? 'Aucune raison spécifiée',
       });
 
@@ -173,15 +176,19 @@ export class LeaveRequestController {
 
   async update(req: Request<object, object, UpdateLeaveRequestBodyType>, res: Response) {
     try {
-      const start_date = new Date(req.body.start_date);
-      const end_date = new Date(req.body.end_date);
-      const created_at = new Date(req.body.created_at);
+      const start_date = DateTime.fromISO(req.body.start_date, { zone: 'utc' }).setZone(
+        'Europe/Paris',
+      );
+      const end_date = DateTime.fromISO(req.body.end_date, { zone: 'utc' }).setZone('Europe/Paris');
+      const created_at = DateTime.fromISO(req.body.created_at, { zone: 'utc' }).setZone(
+        'Europe/Paris',
+      );
 
       const leaveRequest: ILeaveRequest = {
         ...req.body,
-        start_date,
-        end_date,
-        created_at,
+        start_date: start_date.toJSDate(),
+        end_date: end_date.toJSDate(),
+        created_at: created_at.toJSDate(),
       };
 
       await LeaveRequestRepo.update(leaveRequest);
@@ -202,8 +209,8 @@ export class LeaveRequestController {
         statusColor: leaveRequest.request_status === 'approved' ? 'green' : 'red',
         status: leaveRequest.request_status === 'approved' ? 'acceptée' : 'refusée',
         leaveType: leaveRequest.leave_type,
-        startDate: leaveRequest.start_date.toLocaleString(),
-        endDate: leaveRequest.end_date.toLocaleString(),
+        startDate: start_date.toFormat('dd MMMM yyyy, HH:mm:ss', { locale: 'fr' }),
+        endDate: end_date.toFormat('dd MMMM yyyy, HH:mm:ss', { locale: 'fr' }),
         reason: leaveRequest.reason ?? 'Aucune raison spécifiée',
       });
       return res.sendResponse(
@@ -238,11 +245,13 @@ export class LeaveRequestController {
         }
 
         const currentYear = new Date().getFullYear();
-        const deadlineDate = new Date(currentYear, 9, 31);
+        const deadlineDate = DateTime.fromISO(`${currentYear}-12-31`, { zone: 'utc' }).setZone(
+          'Europe/Paris',
+        );
         await emailService.sendReminderEmail(user.email, {
           civility: user.civility,
           lastName: user.last_name,
-          deadlineDate: deadlineDate.toLocaleString(),
+          deadlineDate: deadlineDate.toFormat('dd MMMM yyyy', { locale: 'fr' }),
           daysLeft: user.remaining_leave_balance.toString(),
         });
       }

@@ -26,10 +26,13 @@
           <p><strong>Raison :</strong> {{reason}}</p>
         </div>
         <p>
-          {% if status == 'acceptée' %} Félicitations, votre demande de congé a été acceptée.
-          Veuillez vous assurer de respecter les dates mentionnées ci-dessus. {% else %}
-          Malheureusement, votre demande de congé a été refusée. Pour toute question ou
-          clarification, veuillez contacter votre responsable. {% endif %}
+          {{#if isAccepted}}
+            Félicitations, votre demande de congé a été acceptée. Veuillez vous assurer de respecter
+            les dates mentionnées ci-dessus.
+          {{else}}
+            Malheureusement, votre demande de congé a été refusée. Pour toute question ou
+            clarification, veuillez contacter votre responsable.
+          {{/if}}
         </p>
       </div>
       <div class='footer'>© 2024 Gérico. Tous droits réservés.</div>

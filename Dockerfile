@@ -16,6 +16,7 @@ WORKDIR /usr/app
 
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/public /usr/app/public
+COPY --from=build /app/services/mail/templates /usr/app/services/mail/templates
 COPY --from=build /app/dist ./
 
 CMD ["node", "index.js"]

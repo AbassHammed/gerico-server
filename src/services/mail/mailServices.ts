@@ -39,7 +39,7 @@ class EmailService {
     try {
       const html = await this.renderTemplate(options.template, options.context);
       await this.resend.emails.send({
-        from: 'Gerico Transport <noreply@gericotransport.fr>',
+        from: 'Gerico Transport <support@gericotransport.fr>',
         to: options.to,
         subject: options.subject,
         html,
@@ -128,11 +128,14 @@ class EmailService {
       reason?: string;
     },
   ): Promise<void> {
+    const subject =
+      context.status === 'acceptée' ? 'Demande de congé acceptée' : 'Demande de congé refusée';
+    const isAccepted = context.status === 'acceptée';
     await this.queueEmail({
       to,
-      subject: 'Demande de congé traitée',
+      subject,
       template: 'leave_result',
-      context,
+      context: { ...context, isAccepted },
     });
   }
 
@@ -148,7 +151,7 @@ class EmailService {
     await this.queueEmail({
       to,
       subject: 'Rappel de congé',
-      template: 'leave_remin',
+      template: 'leave_remain',
       context,
     });
   }
