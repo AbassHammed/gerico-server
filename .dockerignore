@@ -1,12 +1,7 @@
-# Exclude dotfiles and directories
-.github
-.husky
-.vscode
-.*
-
-# Exclude the tests directory
+node_modules
 tests
-
-# Exclude any other unnecessary files or directories
-Dockerfile
+.git
+.gitignore
 .dockerignore
+docker-compose.yml
+tsconfig.json

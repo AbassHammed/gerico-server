@@ -66,16 +66,58 @@ class LeaveRequestRepo
     });
   }
 
-  retrieveByUserId(uid: string, params: PaginationParams): Promise<PaginatedResult<ILeaveRequest>> {
+  retrieveByUserId(
+    uid: string,
+    params: PaginationParams,
+    status?: string,
+  ): Promise<PaginatedResult<ILeaveRequest>> {
+    let query = 'SELECT * FROM leave_requests WHERE uid = ?';
+    let countQuery = 'SELECT COUNT(*) as total FROM leave_requests WHERE uid = ?';
+    const queryParams: (string | number)[] = [uid];
+    const countQueryParams: (string | number)[] = [uid];
+
+    if (status) {
+      query += ' AND request_status = ?';
+      countQuery += ' AND request_status = ?';
+      queryParams.push(String(status));
+      countQueryParams.push(String(status));
+    }
+
+    query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
+    queryParams.push(Number(params.limit), Number(params.offset));
+
+    return this.executePaginatedQuery(query, queryParams, countQuery, countQueryParams);
+  }
+
+  retrieveUpcomingByUserId(uid: string): Promise<ILeaveRequest[]> {
     const query =
-      'SELECT * FROM leave_requests WHERE uid = ? ORDER BY created_at DESC LIMIT ? OFFSET ?';
-    const countQuery = 'SELECT COUNT(*) as total FROM leave_requests WHERE uid = ?';
-    return this.executePaginatedQuery(
-      query,
-      [uid, Number(params.limit), Number(params.offset)],
-      countQuery,
-      [uid],
-    );
+      'SELECT * FROM leave_requests WHERE uid = ? AND end_date > NOW() AND request_status = ?';
+    const queryParams: (string | number)[] = [uid, 'approved'];
+
+    return new Promise((resolve, reject) => {
+      connection.query<ILeaveRequestRowData[]>(query, queryParams, (err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res);
+        }
+      });
+    });
+  }
+
+  retrieveAllUpcoming(): Promise<ILeaveRequest[]> {
+    const query = 'SELECT * FROM leave_requests WHERE end_date > NOW() AND request_status = ?';
+    const queryParams: (string | number)[] = ['approved'];
+
+    return new Promise((resolve, reject) => {
+      connection.query<ILeaveRequestRowData[]>(query, queryParams, (err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res);
+        }
+      });
+    });
   }
 
   retrieveByStatus(
@@ -119,7 +161,7 @@ class LeaveRequestRepo
   update(t: ILeaveRequest): Promise<true> {
     return new Promise((resolve, reject) => {
       connection.query(
-        'UPDATE leave_requests SET start_date = ?, end_date = ?, reason = ?, leave_type = ? request_status = ? WHERE leave_request_id = ?',
+        'UPDATE leave_requests SET start_date = ?, end_date = ?, reason = ?, leave_type = ?, request_status = ? WHERE leave_request_id = ?',
         [t.start_date, t.end_date, t.reason, t.leave_type, t.request_status, t.leave_request_id],
         err => {
           if (err) {

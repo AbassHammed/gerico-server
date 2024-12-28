@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <style>
+      body { font-family: Arial, sans-serif; color: #333; background-color: #f4f4f4; }
+      .email-container { max-width: 600px; margin: 20px auto; background: white; border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); } .header { background-color: #0073e6; color:
+      white; padding: 20px; text-align: center; font-size: 24px; } .content { padding: 20px; color:
+      #555; line-height: 1.6; } .info-box { background-color: #f4f4f4; padding: 10px; border-radius:
+      5px; margin-top: 15px; } .footer { background-color: #f4f4f4; color: #666; padding: 10px;
+      text-align: center; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <div class='email-container'>
+      <div class='header'>Notification de demande de congé</div>
+      <div class='content'>
+        <p>Bonjour {{civility}} {{lastName}},</p>
+        <p>Nous avons bien reçu votre demande de congé. Voici les détails de votre demande :</p>
+        <div class='info-box'>
+          <p><strong>Type de congé :</strong> {{leaveType}}</p>
+          <p><strong>Date de début :</strong> {{startDate}}</p>
+          <p><strong>Date de fin :</strong> {{endDate}}</p>
+          <p><strong>Raison :</strong> {{reason}}</p>
+        </div>
+        <p>Votre demande est en cours de traitement. Vous serez notifié une fois qu'une décision
+          sera prise.</p>
+        <p>Pour toute question, n'hésitez pas à contacter notre support interne.</p>
+      </div>
+      <div class='footer'>© 2024 Gérico. Tous droits réservés.</div>
+    </div>
+  </body>
+</html>

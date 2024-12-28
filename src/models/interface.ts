@@ -129,6 +129,8 @@ export enum LogType {
   LEAVE_REQUEST_ACCEPTED = 'LEAVE_REQUEST_ACCEPTED',
   LEAVE_REQUEST_REFUSED = 'LEAVE_REQUEST_REFUSED',
   PAYSLIP_AVAILABLE = 'PAYSLIP_AVAILABLE',
+  ACCOUNT_CREATED = 'ACCOUNT_CREATED',
+  LOGIN_ALERT = 'LOGIN_ALERT',
 }
 
 export interface LogEntry {
@@ -137,6 +139,7 @@ export interface LogEntry {
   log_type: LogType;
   log_message: string;
   log_date: Date;
+  is_read: boolean;
 }
 
 export interface LogEntryRowData extends LogEntry, RowDataPacket {}
