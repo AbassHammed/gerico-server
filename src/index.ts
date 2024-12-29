@@ -11,7 +11,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 import express, { Application } from 'express';
 import { logservice } from './services/loggerService';
-import employee from './repositories/users';
 import Server from './routes';
 import { ApiResponse } from './services/ApiResponse';
 import path from 'path';
@@ -32,11 +31,8 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.get('/test', (req, res) => {
-  (async () => {
-    const result2 = await employee.retrieveByEmail('john.doe@example.com');
-    return res.json({ result2 });
-  })();
+app.get('/status', (req, res) => {
+  res.sendResponse(ApiResponse.success(200, undefined, 'Tout va bien'));
 });
 
 app.listen(PORT, () => {

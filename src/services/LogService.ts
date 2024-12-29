@@ -13,7 +13,7 @@ type LogParamsMap = {
 
 type DefaultParams = Record<string, string>;
 
-export class LoggingService {
+class LoggingService {
   private logTemplates = {
     [LogType.LOGIN_ALERT]: () => `Une connexion a été effectuée sur votre compte.`,
     [LogType.PROFILE_UPDATE]: () => `Votre profil a été mis à jour.`,

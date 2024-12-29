@@ -20,6 +20,7 @@ export class CommonUtils {
       return res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));
     }
   }
+
   async retrieveDeductions(req: Request, res: Response) {
     try {
       const isAdmin = await checkAdmin(req.user.uid);

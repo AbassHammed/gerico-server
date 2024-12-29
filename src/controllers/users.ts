@@ -19,6 +19,7 @@ import emailService from '../services/mail/mailServices';
 import { ApiResponse } from '../services/ApiResponse';
 import loggingService from '../services/LogService';
 import userLog from '../repositories/userLog';
+import { DateTime } from 'luxon';
 
 interface LoginResponse {
   token: string;
@@ -139,7 +140,7 @@ export class UsersController {
       await emailService.sendConnectionAlertEmail(user.email, {
         civility: user.civility,
         lastName: user.last_name,
-        loginDate: new Date().toLocaleString(),
+        loginDate: DateTime.now().setZone('Europe/Paris').toLocaleString(DateTime.DATETIME_FULL),
         operatingSystem: os,
         browser,
       });
