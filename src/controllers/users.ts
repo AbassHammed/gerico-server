@@ -140,7 +140,9 @@ export class UsersController {
       await emailService.sendConnectionAlertEmail(user.email, {
         civility: user.civility,
         lastName: user.last_name,
-        loginDate: DateTime.now().setZone('Europe/Paris').toLocaleString(DateTime.DATETIME_FULL),
+        loginDate: DateTime.now()
+          .setZone('Europe/Paris')
+          .toLocaleString(DateTime.DATETIME_FULL, { locale: 'fr-FR' }),
         operatingSystem: os,
         browser,
       });
