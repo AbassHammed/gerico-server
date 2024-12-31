@@ -49,7 +49,7 @@ interface LoginResponse {
 export class UsersController {
   async create(req: Request<object, object, CreateUserInput>, res: Response) {
     try {
-      const { email, last_name, date_of_birth, hire_date } = req.body;
+      const { email, last_name, date_of_birth, hire_date, social_security_number } = req.body;
 
       const admin = await usersRepo.retrieveById(req.user.uid);
 
@@ -77,6 +77,7 @@ export class UsersController {
         hashed_password: hashedPassword,
         created_at: new Date(),
         updated_at: new Date(),
+        social_security_number: social_security_number.replace(/\s+/g, ''),
         is_archived: false,
         reset_code: null,
         departure_date: null,
