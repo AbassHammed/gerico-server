@@ -52,6 +52,7 @@ class UsersRoutes {
     );
     this.router.patch('/archive/:uid', requireAuth, this.controller.archiveUser);
     this.router.get('/me', requireAuth, this.controller.getUser);
+    this.router.get('/all', requireAuth, this.controller.retrieveAllNotArchived);
     this.router.get('/:uid', requireAuth, this.controller.retrieve);
     this.router.get('/', requireAuth, this.controller.retrieveAll);
   }

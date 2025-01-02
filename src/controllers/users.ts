@@ -416,6 +416,23 @@ export class UsersController {
     }
   }
 
+  async retrieveAllNotArchived(req: Request, res: Response) {
+    try {
+      const admin = await usersRepo.retrieveById(req.user.uid);
+
+      if (!admin?.is_admin) {
+        return res.sendResponse(ApiResponse.error(401, 'Accès refusé : utilisateur non autorisé'));
+      }
+
+      const users = await usersRepo.retrieveAllNotArchived();
+
+      return res.sendResponse(ApiResponse.success(200, users));
+    } catch (error) {
+      logservice.error('[retrieveAllNotArchived$UsersController]', error);
+      return res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur.'));
+    }
+  }
+
   async getUser(req: Request, res: Response) {
     try {
       const user = await usersRepo.retrieveById(req.user.uid);
