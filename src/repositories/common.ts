@@ -1,3 +1,7 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Hammed Abass. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
 import { IDeduction, IDeductionRow, ISSThreshold, ISSThresholdRow } from '../models/interface';
 import connection from '../models/connect';
 

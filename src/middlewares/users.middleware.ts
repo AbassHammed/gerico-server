@@ -1,4 +1,8 @@
-import { object, string, TypeOf, number, boolean } from 'zod';
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Hammed Abass. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+import { object, string, type TypeOf, number, boolean } from 'zod';
 
 export const createUserSchema = object({
   body: object({

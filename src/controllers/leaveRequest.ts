@@ -1,3 +1,7 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Hammed Abass. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
 import { Request, Response } from 'express';
 import { ApiResponse } from '../services/ApiResponse';
 import { logservice } from '../services/loggerService';

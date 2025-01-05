@@ -1,3 +1,7 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Hammed Abass. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
 import { RowDataPacket } from 'mysql2';
 
 export interface PaginationParams {
@@ -155,41 +159,41 @@ export interface LogEntryRowData extends LogEntry, RowDataPacket {}
 export interface IRepository<T> {
   /**
    * Saves a new entity to the repository.
-   * @param {T} t - The entity to save
-   * @returns {Promise<T>} - A promise that resolves to `true` indicating the save was successfull else an error is thrown
+   * @param t - The entity to save
+   * @returns - A promise that resolves to `true` indicating the save was successfull else an error is thrown
    */
   save?(t: T): Promise<true>;
 
   /**
    * Retrieves all entities from the repository.
-   * @returns {Promise<T[]>} - A promise that resolves to an array of entities
+   * @returns - A promise that resolves to an array of entities
    */
   retrieveAll?(params: PaginationParams): Promise<PaginatedResult<T>>;
 
   /**
    * Retrieves a single entity by its ID.
-   * @param {string | number} id - The ID of the entity to retrieve
-   * @returns {Promise<T | undefined>} - A promise that resolves to the entity or undefined if not found
+   * @param id - The ID of the entity to retrieve
+   * @returns - A promise that resolves to the entity or undefined if not found
    */
   retrieveById?(id: string | number): Promise<T | undefined>;
 
   /**
    * Updates an existing entity in the repository.
-   * @param {T} t - The entity to update
-   * @returns {Promise<true>} - A promise that resolves to `true` indicating the update was successfull else an error is thrown
+   * @param t - The entity to update
+   * @returns - A promise that resolves to `true` indicating the update was successfull else an error is thrown
    */
   update?(t: T): Promise<true>;
 
   /**
    * Deletes an entity by its ID.
-   * @param {string | number} t - The ID of the entity to delete
-   * @returns {Promise<number>} - A promise that resolves to `true` indicating the delete was successfull else an error is thrown
+   * @param t - The ID of the entity to delete
+   * @returns - A promise that resolves to `true` indicating the delete was successfull else an error is thrown
    */
   delete?(id: string | number): Promise<true>;
 
   /**
    * Deletes all entities in the repository.
-   * @returns {Promise<number>} - A promise that resolves to the count of deleted records
+   * @returns - A promise that resolves to the count of deleted records
    */
   deleteAll?(): Promise<number>;
 }

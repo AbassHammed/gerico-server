@@ -1,4 +1,8 @@
-import { object, string, TypeOf } from 'zod';
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Hammed Abass. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+import { object, string, type TypeOf } from 'zod';
 
 export const createIssueSchema = object({
   body: object({
