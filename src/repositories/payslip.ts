@@ -99,6 +99,18 @@ class PayslipRepository
       );
     });
   }
+
+  delete(id: string | number): Promise<true> {
+    return new Promise((resolve, reject) => {
+      connection.query('DELETE FROM pay_slips WHERE pid = ?', [id], err => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(true);
+        }
+      });
+    });
+  }
 }
 
 export default new PayslipRepository();

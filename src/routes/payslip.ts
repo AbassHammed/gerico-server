@@ -28,6 +28,7 @@ class PayslipRoutes {
     );
     this.router.get('/:uid', requireAuth, this.controller.getAllUserPayslips);
     this.router.get('/', requireAuth, this.controller.getAll);
+    this.router.delete('/:pid', requireAuth, this.controller.delete);
   }
 }
 

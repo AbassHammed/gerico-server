@@ -105,3 +105,5 @@ CREATE TABLE leave_requests (
 	leave_type VARCHAR(36) NOT NULL,
 	FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE
 );
+
+

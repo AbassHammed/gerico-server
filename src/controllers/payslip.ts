@@ -147,4 +147,24 @@ export class PayslipController {
       res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));
     }
   }
+
+  async delete(req: Request, res: Response) {
+    try {
+      const isAdmin = checkAdmin(req.user.uid);
+
+      if (!isAdmin) {
+        return res.sendResponse(ApiResponse.error(401, 'Accès refusé : utilisateur non autorisé'));
+      }
+
+      const { pid } = req.params as { pid: string };
+      const trimmedPid = pid.trim();
+
+      await payslipRepo.delete(trimmedPid);
+
+      res.sendResponse(ApiResponse.success(200, undefined, 'La fiche de paie est bien supprimée.'));
+    } catch (error) {
+      logservice.error('[delete$PayslipController]', error);
+      res.sendResponse(ApiResponse.error(500, 'Erreur interne du serveur'));
+    }
+  }
 }
