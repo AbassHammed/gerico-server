@@ -5,3 +5,5 @@ tests
 .dockerignore
 docker-compose.yml
 tsconfig.json
+.eslint-ignore
+LICENSE.txt

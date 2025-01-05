@@ -1,0 +1,13 @@
+.github
+.vscode
+node_modules
+public
+.husky
+.prettierignore
+.prettierrc
+package-lock.json
+tailwind.config.ts
+dist
+tsconfig-docker.json
+Dockerfile
+docker-compose.yml
